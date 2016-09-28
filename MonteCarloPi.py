@@ -10,7 +10,7 @@ y1 = 2
 a = -0.5
 b = 0.5
 r=np.sqrt(b**2)
-n = 1000
+n = 2000
 
 #x = np.linspace(x0,x1,n)
 
@@ -60,5 +60,6 @@ pyplot.plot(xr,f2(xr),color='black')
 pyplot.xlabel('x')
 pyplot.ylabel('y')
 pyplot.title('Approximate $\pi$')
+pyplot.legend(['$\pi$ = {0:2f}'.format(Pi)])
 pyplot.savefig('MCpi.png', bbox_inches='tight')
 pyplot.show()

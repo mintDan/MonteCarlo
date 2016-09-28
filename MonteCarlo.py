@@ -32,7 +32,8 @@ print('Approximated area')
 print(Area)
 
 print('Analytical area')
-print((1/3)*10**3)
+AArea = (1/3)*10**3
+print(AArea)
 
 
 pyplot.hold(True)
@@ -40,6 +41,7 @@ pyplot.plot(x,f(x),c='black')
 pyplot.scatter(xg,yg,color='blue')
 pyplot.xlabel('x')
 pyplot.ylabel('y')
-pyplot.title('Integrate $x^2$')
+pyplot.title('Integrate $x^2$, area = {0:2f}'.format(AArea))
+pyplot.legend(['Approx Area = {0:2f}'.format(Area)])
 pyplot.savefig('MCint.png', bbox_inches='tight')
 pyplot.show()
