@@ -15,6 +15,7 @@ n = 2000
 #x = np.linspace(x0,x1,n)
 
 
+
 #To plot the function
 xr = np.linspace(a,b,n)
 def f1(x):
