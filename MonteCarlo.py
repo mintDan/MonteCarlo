@@ -14,10 +14,12 @@ def f(x):
 xg = np.random.uniform(a, b, size=n)
 yg = np.random.uniform(a, b**2, size=n)
 
+inse = np.array([],dtype=bool)
 below = 0
 for i in range(n):
-	if yg[i] <= f(x[i]):
+	if yg[i] <= f(xg[i]):
 		below+=1
+		inse = np.append(inse,i)
 
 #int x^2 -> (1/3)*x^3
 #[(1/3)x^3]^1,0 = 1/3
@@ -39,6 +41,7 @@ print(AArea)
 pyplot.hold(True)
 pyplot.plot(x,f(x),c='black')
 pyplot.scatter(xg,yg,color='blue')
+pyplot.scatter(xg[inse],yg[inse],color='black')
 pyplot.xlabel('x')
 pyplot.ylabel('y')
 pyplot.title('Integrate $x^2$, area = {0:2f}'.format(AArea))

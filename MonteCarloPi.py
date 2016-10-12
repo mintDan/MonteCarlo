@@ -2,10 +2,10 @@ from matplotlib import pyplot
 import numpy as np
 
 #Grid
-x0 = -2
-x1 = 2
-y0 = -2
-y1 = 2
+x0 = -1
+x1 = 1
+y0 = -1
+y1 = 1
 #Circle
 a = -0.5
 b = 0.5
@@ -25,13 +25,19 @@ def f2(x):
 
 xg = np.random.uniform(x0, x1, size=n)
 yg = np.random.uniform(y0, y1, size=n)
-# xg = np.random.uniform(a, b, size=n)
-# yg = np.random.uniform(a, b, size=n)
 
+
+
+#inse = np.array([])
+inse = np.array([],dtype=bool)
 inside = 0
 for i in range(n):
 	if xg[i]**2+yg[i]**2 <= r**2:
 		inside+=1
+		inse = np.append(inse,i)
+
+
+#print(xinside)
 
 
 
@@ -55,6 +61,7 @@ print('Pi={}'.format(Pi))
 
 pyplot.hold(True)
 pyplot.scatter(xg,yg,color='blue')
+pyplot.scatter(xg[inse],yg[inse],color='black')
 pyplot.plot(xr,f1(xr),color='black')
 pyplot.plot(xr,f2(xr),color='black')
 #pyplot.axis([x0,x1,y0,y1])
