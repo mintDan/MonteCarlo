@@ -9,3 +9,9 @@ Some scripts based on Monte Carlo methods.
 
 ## Buffon's Needle
 ![MCbuffon.png](https://github.com/Bootlegg/MonteCarlo/blob/master/MCBuffon.png)
+
+##Buffon's Needle Normal Distribution
+Instead of using a uniform distribution to throw the needle, here are normal distributed needles. 
+Pi can still be calculated explicitly, but an approximation to the probability is used in practice,  
+since the normal distribution in essence goes to +- infinity. 
+![MCbuffon.png](https://github.com/Bootlegg/MonteCarlo/blob/master/MCBuffonGauss.png)
