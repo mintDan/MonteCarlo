@@ -38,13 +38,14 @@ print(P)
 #Ptheo
 #Ptheo2
 #Without pi in the normalization factor
-Ptheo = 4*0.0258229/np.pi**(3.0/2.0)
+integr = 0.025920
+Ptheo = 4*integr/np.pi**(3.0/2.0)
 print("Theoretical probability")
 print(Ptheo)
 
 
 
-pi = (4.0*0.0258229/P)**(2.0/3.0)
+pi = (4.0*integr/P)**(2.0/3.0)
 print('pi={}'.format(pi))
 
 
