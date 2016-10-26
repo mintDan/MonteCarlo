@@ -19,7 +19,7 @@ The approximated probability P to land near the lines is given below
 
 The real value for P will be slightly larger than this, which the obtained values for pi show, since it always overshoots.
 
-[Pi.png](https://github.com/Bootlegg/MonteCarlo/blob/master/Pi.png)
+![Pi.png](https://github.com/Bootlegg/MonteCarlo/blob/master/Pi.png)
 
 Where the integral I is given by
 
