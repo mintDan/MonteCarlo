@@ -17,19 +17,19 @@ The approximated probability P to land near the lines is given below
 
 ![P.png](https://github.com/Bootlegg/MonteCarlo/blob/master/P.png)
 
-Where the integral I is given by  
-
-![I.png](https://github.com/Bootlegg/MonteCarlo/blob/master/I.png)
-
 The real value for P will be slightly larger than this, which the obtained values for pi show, since it always overshoots.
 
 To calculate the probability, we need to calculate the integral I, and this in itself is done by changing the MonteCarlo.py script.
 
 ![BFint.png](https://github.com/Bootlegg/MonteCarlo/blob/master/BFint.png)
 
-With these results we can continue to find pi, by isolating it from the expressions above.  
+With these results we can continue to find pi, by isolating it from the expressions above.
 
 [Pi.png](https://github.com/Bootlegg/MonteCarlo/blob/master/Pi.png)
+
+Where the integral I is given by  
+
+![I.png](https://github.com/Bootlegg/MonteCarlo/blob/master/I.png)
 
 The result is shown below  
 
