@@ -27,7 +27,7 @@ To calculate the probability, we need to calculate the integral I, and this in i
 
 ![BFint.png](https://github.com/Bootlegg/MonteCarlo/blob/master/BFint.png)
 
-With these results we can continue to find pi, by isolating it from the expressions above.
+With these results we can continue to find pi, by isolating it from the expressions above.  
 
 [pi.png](https://github.com/Bootlegg/MonteCarlo/blob/master/pi.png)
 
