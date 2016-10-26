@@ -29,7 +29,7 @@ To calculate the probability, we need to calculate the integral I, and this in i
 
 With these results we can continue to find pi, by isolating it from the expressions above.  
 
-[pi.png](https://github.com/Bootlegg/MonteCarlo/blob/master/pi.png)
+[Pi.png](https://github.com/Bootlegg/MonteCarlo/blob/master/Pi.png)
 
 The result is shown below  
 
