@@ -29,8 +29,6 @@ To calculate the probability P, we need to calculate the integral I, and this in
 
 ![BFint.png](https://github.com/Bootlegg/MonteCarlo/blob/master/BFint.png)
 
-With these results we can continue to find pi, by isolating it from the expressions above.
-
-The result is shown below
+With these results we can continue to find pi. The result is shown below
 
 ![MCbuffon.png](https://github.com/Bootlegg/MonteCarlo/blob/master/MCBuffonGauss.png)
