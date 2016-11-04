@@ -1,6 +1,12 @@
 # Monte Carlo simulations
 Some scripts based on Monte Carlo methods.
 
+1. [MC integration](https://github.com/mintDan/MonteCarlo#mc-integration)
+2. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
+3. [Buffon's Needle](https://github.com/mintDan/MonteCarlo#Buffons-Needle)
+4. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
+
+
 ## MC integration
 ![MCint.png](https://github.com/Bootlegg/MonteCarlo/blob/master/MCint.png)
 

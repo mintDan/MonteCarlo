@@ -1,5 +1,7 @@
-from matplotlib import pyplot
 import numpy as np
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 
 a = 0
 b = 10
@@ -38,13 +40,14 @@ AArea = (1/3)*10**3
 print(AArea)
 
 
-pyplot.hold(True)
-pyplot.plot(x,f(x),c='black')
-pyplot.scatter(xg,yg,color='blue')
-pyplot.scatter(xg[inse],yg[inse],color='black')
-pyplot.xlabel('x')
-pyplot.ylabel('y')
-pyplot.title('Integrate $x^2$, area = {0:2f}'.format(AArea))
-pyplot.legend(['Approx Area = {0:2f}'.format(Area)])
-pyplot.savefig('MCint.png', bbox_inches='tight')
-pyplot.show()
+plt.plot(x,f(x))
+#pyplot.hold(True)
+#pyplot.plot(x,f(x),c='black')
+#pyplot.scatter(xg,yg,color='blue')
+#pyplot.scatter(xg[inse],yg[inse],color='black')
+#pyplot.xlabel('x')
+#pyplot.ylabel('y')
+#pyplot.title('Integrate $x^2$, area = {0:2f}'.format(AArea))
+#pyplot.legend(['Approx Area = {0:2f}'.format(Area)])
+#pyplot.savefig('MCint.png', bbox_inches='tight')
+plt.show()
