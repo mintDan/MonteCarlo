@@ -14,6 +14,9 @@ use the traditional method as adapted from standard numerical integration.
 ![MCint.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCint.png)
 
 ## MC calculate pi
+Compares the amount of points landing inside and outside the circle, which together with the area outside, gives an approximation for pi.
+As seen here the result is pi = 2.9.
+
 ![MCpi.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCpi.png)
 
 ##Buffon's Needle Normal Distribution
