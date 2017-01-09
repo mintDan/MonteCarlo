@@ -9,17 +9,17 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 
-def MC(a,b,n):
+def MC(a,b,n,f):
 	"""
 	This goes through the calculation of the definite integral
 	Also calls the plotting function
 	"""
 
 	#Making array for plotting, doesn't have to be set with n.
-	x = np.linspace(a,b,n)
+	x = np.linspace(a,b,n,f)
 
 	xg = np.random.uniform(a, b, size=n)
-	yg = np.random.uniform(a, b**2, size=n)
+	yg = np.random.uniform(a, np.max(f(x)), size=n)
 
 	inse = np.array([],dtype=bool)
 	below = 0
@@ -41,20 +41,23 @@ def MC(a,b,n):
 	#print(Area)
 
 	#print('Analytical area')
-	AArea = (1/3)*10**3
+	#AArea = (1/3)*10**3
 	#print(AArea)
 
-	plot(x,f(x),xg,yg,xg[inse],yg[inse],AArea,Area)
+	plot(x,f(x),xg,yg,xg[inse],yg[inse],Area)
 
 
-def plot(x,fx,xg,yg,xginse,yginse,AArea,Area):
+	return Area
+
+
+def plot(x,fx,xg,yg,xginse,yginse,Area):
 	plt.hold(True)
 	plt.plot(x,fx,color='black')
 	plt.scatter(xg,yg,color='blue')
 	plt.scatter(xginse,yginse,color='black')
 	plt.xlabel('x')
 	plt.ylabel('y')
-	plt.title('Integrate $x^2$, area = {0:2f}'.format(AArea))
+	plt.title('Integrate $f(x)$')
 	plt.legend(['Approx Area = {0:2f}'.format(Area)])
 	plt.savefig('figs/MCint.png', bbox_inches='tight')
 	plt.show()
@@ -71,4 +74,4 @@ if __name__ == "__main__":
 	def f(x):
 		return x**2
 
-	MC(x0,x1,n)
+	MC(x0,x1,n,f)

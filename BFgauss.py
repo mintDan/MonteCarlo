@@ -1,9 +1,26 @@
+"""Doing Buffon's Needle but with normal distribution of needles...
+Calls the MonteCarlo module to calculate an integral
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import MonteCarlo
 
 
 
+#Calculating needed integral by calling MonteCarlo module
+x0 = 0
+x1 = 0.1
+n = 1000
+def f(x):
+	return (1.0/np.sqrt(2.0*0.2**2))*np.arccos(x/0.1)*np.exp(-(x-0.5)**2/(2.0*0.2**2))
+
+integr = MonteCarlo.MC(x0,x1,n,f)
+
+
+
+#Doing Buffon's Needle experiment with 
 N = 2000000
 
 x0 = 0
@@ -15,8 +32,6 @@ sigma = 0.2
 mu = 0.5
 
 #Throwing the needles
-#x = np.random.uniform(x0, x1, size=N)
-#y = np.random.uniform(x0, x1, size=N)
 
 x = np.random.normal(mu, sigma, size=N)
 y = np.random.uniform(y0, y1, size=N)
@@ -38,7 +53,7 @@ print(P)
 #Ptheo
 #Ptheo2
 #Without pi in the normalization factor
-integr = 0.025920
+#integr = 0.025920
 Ptheo = 4*integr/np.pi**(3.0/2.0)
 print("Theoretical probability")
 print(Ptheo)
@@ -69,8 +84,8 @@ ax.plot([x1,x1],[y0,y1],'-',color='black')
 ax.plot(xp,nplot,color='blue')
 ax.legend(['$\pi$ = {0:2f}'.format(pi)])
 
-fig.savefig('MCBuffonGauss.png', bbox_inches='tight')
-plt.show() #fig.show() does not much?
+fig.savefig('figs/MCBuffonGauss.png', bbox_inches='tight')
+plt.show()
 
 
 
