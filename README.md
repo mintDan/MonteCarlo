@@ -7,6 +7,10 @@ Some scripts based on Monte Carlo methods.
 
 
 ## MC integration
+The MonteCarlo.py script is a module that can be called from other scripts, and is used in Buffon's needle with normal distributed needles.
+The probability is calculated by comparing areas here, so in theory only linearly distributed points can be used, I think. To use different distributions, one must 
+use the traditional method as adapted from standard numerical integration. 
+
 ![MCint.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCint.png)
 
 ## MC calculate pi
@@ -27,7 +31,7 @@ Where the integral I is given by
 
 ![I.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/I.png)
 
-To calculate the probability P, we need to calculate the integral I, and this in itself is done by changing the MonteCarlo.py script.
+To calculate the probability P, we need to calculate the integral I, and this in itself is done by calling MonteCarlo.py as a module.
 
 ![BFint.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/BFint.png)
 
