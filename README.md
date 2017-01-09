@@ -3,8 +3,7 @@ Some scripts based on Monte Carlo methods.
 
 1. [MC integration](https://github.com/mintDan/MonteCarlo#mc-integration)
 2. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
-3. [Buffon's Needle](https://github.com/mintDan/MonteCarlo#buffons-needle)
-4. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
+3. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
 
 
 ## MC integration
@@ -12,9 +11,6 @@ Some scripts based on Monte Carlo methods.
 
 ## MC calculate pi
 ![MCpi.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCpi.png)
-
-## Buffon's Needle
-![MCbuffon.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCBuffon.png)
 
 ##Buffon's Needle Normal Distribution
 Instead of using a uniform distribution to throw the needle, here are normal distributed needles. 

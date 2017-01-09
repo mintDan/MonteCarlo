@@ -10,6 +10,10 @@ import matplotlib.pyplot as plt
 
 
 def MC(a,b,n):
+	"""
+	This goes through the calculation of the definite integral
+	Also calls the plotting function
+	"""
 
 	#Making array for plotting, doesn't have to be set with n.
 	x = np.linspace(a,b,n)
@@ -52,7 +56,7 @@ def plot(x,fx,xg,yg,xginse,yginse,AArea,Area):
 	plt.ylabel('y')
 	plt.title('Integrate $x^2$, area = {0:2f}'.format(AArea))
 	plt.legend(['Approx Area = {0:2f}'.format(Area)])
-	plt.savefig('MCint.png', bbox_inches='tight')
+	plt.savefig('figs/MCint.png', bbox_inches='tight')
 	plt.show()
 
 
