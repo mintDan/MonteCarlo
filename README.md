@@ -2,8 +2,9 @@
 Some scripts based on Monte Carlo methods.
 
 1. [MC integration](https://github.com/mintDan/MonteCarlo#mc-integration)
-2. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
-3. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
+2. [Ising model](https://github.com/mintDan/MonteCarlo#ising-model)
+3. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
+4. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
 
 
 ## MC integration
@@ -12,6 +13,13 @@ The probability is calculated by comparing areas here, so in theory only linearl
 use the traditional method as adapted from standard numerical integration. 
 
 ![MCint.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCint.png)
+
+## Ising model
+This 2D Ising model sets up a square lattice with each site representing an electron spin with direction up +1 or down -1. Ferromagnetic behavior shows when there's a  
+majority of spin either up or down, which can happen at a low temperature. At high temperature the thermal disturbances will randomize the direction of the magnetic dipoles(electron spin)  
+such that the magnet becomes a paramagnet, losing its ferromagnetic properties.
+
+![Ising.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Ising.png)
 
 ## MC calculate pi
 Compares the amount of points landing inside and outside the circle, which together with the area outside, gives an approximation for pi.
