@@ -19,25 +19,28 @@ This 2D Ising model sets up a square lattice with each site representing an elec
 majority of spin either up or down, which can happen at a low temperature. At high temperature the thermal disturbances will randomize the direction of the magnetic dipoles(electron spin)  
 such that the magnet becomes a paramagnet, losing its ferromagnetic properties.
 
-![Ising.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Ising2.45.png)
+![Ising.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Ising2.45.png)  
+
 We see here the spin lattice at T = 2.45, slightly higher than the critical temperature. Domains are still visible, with red being spin up, blue being spin down.
 Started from random configuration.
 
-![Ising.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Ising4.85.png)
+![Ising.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Ising4.85.png)  
+
 For T = 4.85, the thermal disturbances are too strong for any significant domains to develop.
 
 
-![Magnetization.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Magnetization.png)
+![Magnetization.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Magnetization.png)  
+
 The magnetization is a measure of alignment and order, and therefore strength of the magnetic field from the magnet. Magnetization can be negative or positive depending on which way the macroscopic field is oriented.
 Magnization is higher at low T, if you start from an ordered state, than at high T, since the thermal disturbances will break alignment.
 
 
+![Energy.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Energy.png)  
 
-![Energy.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Energy.png)
 Energy pr spin site. At low T, starting from an ordered state, the dipoles will try to be put into the lower energy states, as specified by the energy from their neighbors.
 
 
-![Susceptibility.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Susceptibility.png)
+![Susceptibility.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Susceptibility.png)  
 
 The susceptibility is a measure for how the material reacts to an external magnetic field. If x_v is positive, the material is more paramagnetic, and the dipoles inside can align to a greater degree
 with the external field. The models gives low susceptibility for low T, since the dipoles are firm in their arrangement. Higher T will make the dipoles more free to be influenced by an external field, but,
