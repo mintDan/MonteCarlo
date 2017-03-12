@@ -40,6 +40,8 @@ M = np.sum(S)
 def CalcH(S):
 	
 	H = 0
+	
+	H2 = 0
 
 	#Jeg bør bruge nogle pointers, så jeg ikke double count.. fx "S12*S11" eksisterer, så "S11*S12" skal ikke 
 	#tilføjes til H... Så måske først lave pairs, og derefter sum dem up..
@@ -53,30 +55,51 @@ def CalcH(S):
 			if j == 0:
 				H += -J*S[nx-1,i]*S[j,i]
 				H += -J*S[1,i]*S[j,i]
+				
+				#H2 += np.abs(-J*S[nx-1,i]*S[j,i])
+				#H2 += np.abs(-J*S[1,i]*S[j,i])
 			elif j == nx-1:
 				H += -J*S[0,i]*S[j,i]
 				H += -J*S[nx-2,i]*S[j,i]
+				
+				#H2 += np.abs(-J*S[0,i]*S[j,i])
+				#H2 += np.abs(-J*S[nx-2,i]*S[j,i])
 			else:
 				H += -J*S[j-1,i]*S[j,i]
 				H += -J*S[j+1,i]*S[j,i]
+				
+				H2 += np.abs(-J*S[j-1,i]*S[j,i])
+				H2 += np.abs(-J*S[j+1,i]*S[j,i])
 				
 			
 			if i == 0:
 				H += -J*S[j,ny-1]*S[j,i]
 				H += -J*S[j,1]*S[j,i]
+				
+				#H2 += np.abs(-J*S[j,ny-1]*S[j,i])
+				#H2 += np.abs(-J*S[j,1]*S[j,i])
+				
 			elif i == ny-1:
 				H += -J*S[j,0]*S[j,i]
 				H += -J*S[j,ny-2]*S[j,i]
+				
+				#H2 += np.abs(-J*S[j,0]*S[j,i])
+				#H2 += np.abs(-J*S[j,ny-2]*S[j,i])
 			else:
 				H += -J*S[j,i+1]*S[j,i]
 				H += -J*S[j,i-1]*S[j,i]
+				
+				#H2 += np.abs(-J*S[j,i+1]*S[j,i])
+				#H2 += np.abs(-J*S[j,i-1]*S[j,i])
 	
 	#Noget med at jeg skal calculate probabilities, right? Eller, nej, måske ikke, men man KUNNE godt...
 	#Men der vil være 10^10 mulige permutations så hvis jeg tænker rigtigt...
 	#Hvis man vil brute force probabilities...
 
 
-	H = H/2 #How many times does it count the same? Gotta try it 4x4 grid maybe
+	H = H/2
+
+	#H2 = H2/2 #How many times does it count the same? Gotta try it 4x4 grid maybe
 	#Energien burde være integer så vidt jeg kan se, men lige nu får jeg 190.5 etc... de der 0.5
 	#Kan jo prøve med grid i full +1, så bør den give en easy analytical expression for energy som
 	#jeg kan compare...
@@ -91,25 +114,25 @@ def Esiteflip(S,j,i):
 	#Should see if this energy is correct
 	
 	if j == 0:
-		E2 += -S[nx-1,i]*(-1)
-		E2 += -S[1,i]*(-1)
+		E2 += -S[nx-1,i]#*(-1)
+		E2 += -S[1,i]#*(-1)
 	elif j == nx-1:
-		E2 += -S[0,i]*(-1)
-		E2 += -S[nx-2,i]*(-1)
+		E2 += -S[0,i]#*(-1)
+		E2 += -S[nx-2,i]#*(-1)
 	else:
-		E2 += -S[j-1,i]*(-1)
-		E2 += -S[j+1,i]*(-1)
+		E2 += -S[j-1,i]#*(-1)
+		E2 += -S[j+1,i]#*(-1)
 		
 
 	if i == 0:
-		E2 += -S[j,ny-1]*(-1)
-		E2 += -S[j,1]*(-1)
+		E2 += -S[j,ny-1]#*(-1)
+		E2 += -S[j,1]#*(-1)
 	elif i == ny-1:
-		E2 += -S[j,0]*(-1)
-		E2 += -S[j,ny-2]*(-1)
+		E2 += -S[j,0]#*(-1)
+		E2 += -S[j,ny-2]#*(-1)
 	else:
-		E2 += -S[j,i+1]*(-1)
-		E2 += -S[j,i-1]*(-1)
+		E2 += -S[j,i+1]#*(-1)
+		E2 += -S[j,i-1]#*(-1)
 	
 	#Da summen bliver J*(term+term+term+term), så får vi 4J, men vi kan gå fra -8 til 8, right?
 	#Så jeg skal calculate 16 exponentials? Eller 17, med 0...
@@ -117,7 +140,7 @@ def Esiteflip(S,j,i):
 	#Eller er det noget med at dE altid er et lige tal? Dette vil gøre tingene mere simple
 	#Ja, det er jo altid lige tal, forid vi har faktor 2... så jeg kan fjerne nogle af precalc
 	#exponentials, men, whatever...
-	return 2*E2*S[j,i]
+	return 2*E2*S[j,i]*(-1)
 	
 
 H1 = CalcH(S)
@@ -177,6 +200,7 @@ PreCalcExp = [np.exp(-(i-8.0)/T) for i in range(17)]
 Ms = []
 Es = []
 XTs = []
+Cvs = []
 Ts = []
 
 
@@ -187,6 +211,9 @@ for nt in range(Nt):
 	Eavg = 0
 	Mavg = 0
 	M2avg = 0
+	
+	#Denner her er speshul
+	E2avg = 0
 	
 	#Precalculated exponenstial, for every T, for more efficiency
 	#Der er noget i vejen emd disse, heldigvis, så er det til at fix ftw
@@ -209,6 +236,7 @@ for nt in range(Nt):
 		
 		
 		#100*N = 100*625 = 62500
+		#E2calcavg = 0
 		for n in range(150*N):
 			randi = np.random.randint(0,nx)
 			randj = np.random.randint(0,nx)
@@ -227,20 +255,42 @@ for nt in range(Nt):
 				#P = np.exp(-dH/T)
 				if x <= P:
 					S[randj,randi] *= -1
-
+					
+			#if n >= 150*N-20:
+			#	Etotalavg = CalcH(S)
+				
+			#	E2calcavg = E2calcavg + Etotalavg*Etotalavg
+				
+		#E2calcavg *= (1.0/20.0)
 		#Calculate Magnetization
 		#I want it to be absolute value, and an average, pr site, i think.
 		#I want to to be absolute especially if I'm gonna run the test multiple times and average it.
-		Mavg = Mavg + np.abs(np.sum(S))/N
+		
+		Mtotal = np.abs(np.sum(S))
+		
+		
+		Mavg = Mavg + Mtotal
 		
 
-		#Calculate Energies
-		Eavg = Eavg + CalcH(S)/N
+		#Calculate Energies, jeg venter med at divide med N til sidst, pga E2avg
+		Etotal = CalcH(S)
+		
+		Eavg = Eavg + Etotal
+		
+		E2avg = E2avg + Etotal*Etotal
+		
+		#Inklusiv intra-avg:
+		#E2avg = E2avg + E2calcavg
 
 		
-		#Used for isothermal susceptibility
-		M2avg = M2avg + np.abs(np.sum(S**2))/N
-	
+		#Used for isothermal susceptibility, skal måske her divide med N**2?
+		#Skal måske også lave den til M*M ligesom Etotal*Etotal...
+		#I (<M2>-<M>**2) så vil <M>**2 have faktor 1/N**2, mens <M2> kun har faktor 1/N
+		#Så det skal nok være faktor 1/N**2 også på M2
+		
+		#M2avg = M2avg + Mtotal*Mtotal
+		
+		M2avg = M2avg + np.abs(np.sum(S**2))
 	
 	
 	
@@ -248,9 +298,81 @@ for nt in range(Nt):
 	E = Eavg/ntest
 	M = Mavg/ntest
 	M2 = M2avg/ntest
+	E2 = E2avg/ntest
 	
 	#Calculate Isothermal susceptibility
-	XT = (1/T)*(M2**2-M**2)
+	#Det er egentlig XT pr site, pga N**2... men det er pr site squared, virker ikke helt rigtigt
+	XT = (1/T)*(M2**2-M**2)/N**2
+	
+	#Calculate specific heat
+	#Kan også prøve at sammenligne med finite differences
+	#Dette er egentlig Cv pr mass/site
+	#Hvilke values af Cv får de andre?
+	
+	
+	#Lad os køre specific heat uden N... det er jo <E**2>-<E>**2, men IKKE PR SPIN.
+	Cv = (1/T**2)*(E2-E**2)/N
+	#Det kan godt være, at i stedet for np.abs(), skal det være ( )**2
+	
+	
+	
+	E = E/N
+	M = M/N
+	
+	
+	
+	#2-dimensional_ising_model
+	#XT i ranges 0-100
+	#Cv i range 0-0.6
+	#ENergy pr link 0-(-1)
+	
+	#advancedlab1_Part1
+	#E per site 0-(-2)
+	#Cv specific 0-0.12
+	#X 0-0.3
+	#Nok kun E som er pr site?
+	
+	
+	#AsherIsingModelReport
+	#E pr site 0-(-2)
+	#X 0-0.4
+	#Cv 0-0.2
+	
+	
+	#Chap12_Ising_Model_v04
+	#E pr site 0-(-2)
+	#Cv/N 0-4
+	
+	
+	#Ising (1)
+	#C/N 0-3
+	#E/N 0-(-2)
+	
+	
+	#Ising Model 1
+	#E 0-(-1)
+	#Cv 0-10
+	#XT 0-300
+	
+	
+	#ising_Model
+	#E pr spin 0-(-4)
+	#Cv 0-5000
+	#XT pr spin 0-0.18
+	
+	
+	#lecture6-stat_mech
+	#Cv pr spin 0-2
+	#
+	
+	#SCALAS2013_04_16-17
+	#Cv 0-1.5
+	
+	#Student Ising Swarthmore
+	#E fra 0-(-2)
+	#Cv 0-0.2
+	#X 0-0.1
+	
 	
 	
 	#Save figure
@@ -266,6 +388,7 @@ for nt in range(Nt):
 	Es.append(E)
 	XTs.append(XT)
 	Ts.append(T)
+	Cvs.append(Cv)
 	T += dT
 
 	
@@ -293,7 +416,17 @@ plt.ylabel("XT")
 plt.title("Isothermal Susceptibility")
 fig4.savefig('Susceptibility', bbox_inches='tight')
 plt.show()
-	
+
+
+fig5 = plt.figure(5)
+plt.plot(Ts,Cvs)
+plt.xlabel("T")
+plt.ylabel("Cv")
+plt.title("Specific heat")
+fig5.savefig('Specificheat.png', bbox_inches='tight')
+plt.show()
+
+
 print(Ms)
 print(Ts)
 #Lige nu der går den til M = +-625... 
