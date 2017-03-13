@@ -208,15 +208,18 @@ Ts = []
 for nt in range(Nt):
 	
 	
+	
+	#These will be averaged out over ntest times...
+	#With independent starting points
 	Eavg = 0
 	Mavg = 0
 	M2avg = 0
-	
-	#Denner her er speshul
 	E2avg = 0
 	
+	
+	
 	#Precalculated exponenstial, for every T, for more efficiency
-	#Der er noget i vejen emd disse, heldigvis, så er det til at fix ftw
+	#Right now i make 17, but there's only 5 i think! Because of 2* faktor, so only even numbers
 	PreCalcExp = [np.exp(-(i-8.0)/T) for i in range(17)]
 	
 	#Fordi noget med at bad initial conditions kan give local minim..
@@ -234,9 +237,24 @@ for nt in range(Nt):
 		#Lige her bør jeg faktisk lave en endnu en loop
 		
 		
-		
+		MEquilibriumCount = 0
 		#100*N = 100*625 = 62500
 		#E2calcavg = 0
+		
+		#Well i can't have division by 0 error, so...
+		Mlasteq = 1
+		
+		#I need to make an average of M*M for <M**2>
+		#And later, I need to make an average of THESE aswell, with 1/ntest faktor
+		#So it will be double average for <M**2>, and probably should do the same for <E**2>?
+		Avgcount = 0
+		
+		MavgMC = 0
+		M2avgMC = 0
+		EavgMC = 0
+		E2avgMC = 0
+		
+		
 		for n in range(150*N):
 			randi = np.random.randint(0,nx)
 			randj = np.random.randint(0,nx)
@@ -256,53 +274,111 @@ for nt in range(Nt):
 				if x <= P:
 					S[randj,randi] *= -1
 					
-			#if n >= 150*N-20:
-			#	Etotalavg = CalcH(S)
+			
+			#Here I count succesive equilibrium states,
+			#It needs to "remember" at least 2 magnetizations, the current and the last
+			#Can be made more advanced, but that's the simplest
+			if n%N == 0:
+			
+				#We only measure M during full Monte Carlo Sweeps
+				Meq = np.abs(np.sum(S))
+				if Mlasteq != 0:
+					if np.abs(Meq/(Mlasteq*100)) < 5:
+						#The last state is within 5% of the current, so we have an Equilibrium count
+						MEquilibriumCount += 1
+						
+					#Reset equilibrium counter
+					#Hvis vi har fx count == 2, men så kommer der en huge spike, så skal count gå tilbage til 0...
+					else:
+						MEquilibriumCount = 0
 				
-			#	E2calcavg = E2calcavg + Etotalavg*Etotalavg
+				if MEquilibriumCount >= 10:
+					#We have reached equilibrium let's say, since the last 10 equilibriums are within 5%
+
+					#For equilibrium counts above 10, we calculate average M2
+					MavgMC += Meq
+					M2avgMC += Meq*Meq
+					
+					Ecalc = CalcH(S)
+					EavgMC += Ecalc
+					E2avgMC += Ecalc*Ecalc
+					
+					
+					#Avgcount used for E and M
+					Avgcount += 1
+					
+				
+				if MEquilibriumCount == 20:
+				
+					#So we have done 10x measurements for M2, E2 etc, and now we're ready to exit this state
+					break
+					
+				else:
+					Mlasteq = Meq
+				
+		#The first, inner average of M**2
+		MavgMC *= (1/Avgcount)
+		M2avgMC *= (1/Avgcount)
+		E2avgMC *= (1/Avgcount)
+		EavgMC *= (1/Avgcount)
+				
+				
 				
 		#E2calcavg *= (1.0/20.0)
+
+		
+
+		#Calculate Energies, jeg venter med at divide med N til sidst, pga E2avg
+		#Etotal = CalcH(S)
+		
+		#Eavg += Etotal
+		
+		#Calculate Eavg from equilibration samples
+		Eavg += EavgMC
+		
+		
+		#E2avg += Etotal*Etotal
+		
+		#Calculate E2avg with the already averaged E2avgMC, to get <E**2>
+		E2avg += E2avgMC
+		
+		
 		#Calculate Magnetization
 		#I want it to be absolute value, and an average, pr site, i think.
 		#I want to to be absolute especially if I'm gonna run the test multiple times and average it.
 		
-		Mtotal = np.abs(np.sum(S))
+		#Mtotal = np.abs(np.sum(S))
 		
+		#Mavg += Mtotal
 		
-		Mavg = Mavg + Mtotal
-		
-
-		#Calculate Energies, jeg venter med at divide med N til sidst, pga E2avg
-		Etotal = CalcH(S)
-		
-		Eavg = Eavg + Etotal
-		
-		E2avg = E2avg + Etotal*Etotal
-		
-		#Inklusiv intra-avg:
-		#E2avg = E2avg + E2calcavg
-
+		Mavg += MavgMC
 		
 		#Used for isothermal susceptibility, skal måske her divide med N**2?
 		#Skal måske også lave den til M*M ligesom Etotal*Etotal...
 		#I (<M2>-<M>**2) så vil <M>**2 have faktor 1/N**2, mens <M2> kun har faktor 1/N
 		#Så det skal nok være faktor 1/N**2 også på M2
 		
-		#M2avg = M2avg + Mtotal*Mtotal
+		#M2avg += Mtotal*Mtotal
 		
-		M2avg = M2avg + np.abs(np.sum(S**2))
+		#Calculate M2avg with the already averaged M2avgMC, to REALLY get a <M**2>
+		
+		M2avg += M2avgMC
+		
+		#M2avg = M2avg + np.abs(np.sum(S**2))
 	
 	
 	
 	
 	E = Eavg/ntest
-	M = Mavg/ntest
-	M2 = M2avg/ntest
 	E2 = E2avg/ntest
 	
+	M = Mavg/ntest
+	M2 = M2avg/ntest
+	
+	
 	#Calculate Isothermal susceptibility
-	#Det er egentlig XT pr site, pga N**2... men det er pr site squared, virker ikke helt rigtigt
-	XT = (1/T)*(M2**2-M**2)/N**2
+	#Det er egentlig XT pr site... men det er pr site squared, virker ikke helt rigtigt
+	XT = (1/T)*(M2-M**2)/N
 	
 	#Calculate specific heat
 	#Kan også prøve at sammenligne med finite differences

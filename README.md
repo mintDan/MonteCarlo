@@ -47,6 +47,11 @@ with the external field. The models gives low susceptibility for low T, since th
 too high T means the thermal disturbances will be too strong to give any significant alignment with an external field.
 
 
+![SpecificHeat.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Specificheat.png)  
+
+The specific heat describes how much the internal energy changes when the temperature changes. We see that the internal energy changes mostly around the critical temperature, which can also be seen from the energy graph.
+Once the magnetization reaches 0, and the energy reaches it's maximum, we basically have random configuration of spins, and increasing T cannot do anything to increase the Energy in this system.
+
 
 ## MC calculate pi
 Compares the amount of points landing inside and outside the circle, which together with the area outside, gives an approximation for pi.
