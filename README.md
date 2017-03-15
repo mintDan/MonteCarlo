@@ -3,8 +3,9 @@ Some scripts based on Monte Carlo methods.
 
 1. [MC integration](https://github.com/mintDan/MonteCarlo#mc-integration)
 2. [Ising model](https://github.com/mintDan/MonteCarlo#ising-model)
-3. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
-4. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
+3. [Random Walk method](https://github.com/mintDan/MonteCarlo#random-walk-method)
+4. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
+5. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
 
 
 ## MC integration
@@ -51,6 +52,15 @@ too high T means the thermal disturbances will be too strong to give any signifi
 
 The specific heat describes how much the internal energy changes when the temperature changes. We see that the internal energy changes mostly around the critical temperature, which can also be seen from the energy graph.
 Once the magnetization reaches 0, and the energy reaches it's maximum, we basically have random configuration of spins, and increasing T cannot do anything to increase the Energy in this system.
+
+
+## Random Walk method
+A partial differential equation can be solved by Random Walk method. Starting from some point, we do N random walks, where each walk ends when we land on a boundary. The value at the boundary is then recorded.
+The frequency of boundaries can then give an estimate for the point, i.e if a point is close to a certain boundary, we expect a random walk from that point will end up at that boundary more often than a boundary further away.
+So in a sense, the frequencies give weighted averages to the value of the point.
+
+![TourDuWino.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/TourDuWino.png)
+
 
 
 ## MC calculate pi
