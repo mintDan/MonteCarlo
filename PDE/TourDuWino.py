@@ -6,8 +6,12 @@ from mpl_toolkits.mplot3d import axes3d
 nruns = 100
 nx = 25
 ny = 25
-x = np.linspace(0,1,nx)
-y = np.linspace(0,1,ny)
+Lx = 1
+Ly = 1
+dx = Lx/(nx-1)
+dy = Ly/(ny-1)
+x = np.linspace(0,Lx,nx)
+y = np.linspace(0,Ly,ny)
 
 X,Y = np.meshgrid(x,y)
 
@@ -17,6 +21,11 @@ U[:,0] = 0
 U[ny-1,:] = 1 #Top row
 U[:,nx-1] = 0
 
+
+
+#Let's look at uxx + sin(x)uyy = 0
+
+#P1 = (1.0/4.0)*(1.0/(1+dx*dx*np.sin(X[j,i])/dy*dy))
 
 def BoundaryTest(j,i):
 	
@@ -64,17 +73,25 @@ for j in range(ny):
 				
 				else:
 					P = np.random.uniform(0,1)
-					if P <= 0.25:
+					
+					P1 = (1.0/2.0)*np.sin(X[j,i])/(dy*dy/(dx*dx)+np.sin(X[j,i]))
+					
+					P2 = (1.0/2.0)*(1.0/(1+dx*dx*np.sin(X[j,i])/(dy*dy)))
+					P3 = P1
+					
+					if P <= P1:#0.25:
+					
+					
 						#We go to U[j,i+1]
 						#VisitedPoints.append([jnow,inow+1])
 						#VisitedUs.append(U[jnow,inow+1])
 						inow += 1
-					elif P > 0.25 and P <= 0.5:
+					elif P > P1 and P <= P1+P2:
 						#we go to U[j+1,i]
 						#VisitedPoints.append([jnow+1,inow])
 						#VisitedUs.append(U[jnow+1,inow])
 						jnow += 1
-					elif P > 0.5 and P <= 0.75:
+					elif P > P1+P2 and P <= P1+P2+P3:
 						#we go to U[j,i-1]
 						#VisitedPoints.append([jnow,inow-1])
 						#VisitedUs.append(U[jnow,inow-1])
