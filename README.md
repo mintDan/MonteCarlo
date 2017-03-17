@@ -61,6 +61,15 @@ So in a sense, the frequencies give weighted averages to the value of the point.
 
 ![TourDuWino.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/TourDuWino.png)
 
+### Random Walk On Spheres
+Instead of doing tiny steps while walking, we can make a dynamic stepping size by drawing a circle with size of radius as the distance to the nearest boundary point. The random walk will then be by going to a point on this drawn circle,
+and checking if the new point is close to a boundary point. That way we take much larger steps, without sacrificing the essence of the Random Walk.
+ We can never really expect the random walk to land on a boundary point, since our stepping is continous. Therefore we say that when the walk goes close enough, as dictated by a small epsilon,
+the walk ends.
+The added bonus is that this method works without grids and with arbitrary boundaries, and thus makes it easier to solve PDEs on arbitrary domains.
+The epsilon that is used for detection when the walk is close to a boundary should probably scale with the distance between boundary points... And also, it happens that the walk might actually step OUTSIDE the domain, since the boundary in a sense is diffuse.
+
+![WalkOnSpheres.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/WalkOnSpheresSubplot.png)
 
 
 ## MC calculate pi
