@@ -13,7 +13,7 @@ The MonteCarlo.py script is a module that can be called from other scripts, and 
 The probability is calculated by comparing areas here, so in theory only linearly distributed points can be used, I think. To use different distributions, one must 
 use the traditional method as adapted from standard numerical integration.  
 
-This script uses importance sampling with distributions seen in the legend, and the result of their integration. For this function, the integral is 333.33... analytically.
+The script MCint3.py uses importance sampling with distributions seen in the legend, and the result of their integration. For this function, the integral is 333.33... analytically.
 
 
 ![MCint.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCis.png)
