@@ -11,9 +11,12 @@ Some scripts based on Monte Carlo methods.
 ## MC integration
 The MonteCarlo.py script is a module that can be called from other scripts, and is used in Buffon's needle with normal distributed needles.
 The probability is calculated by comparing areas here, so in theory only linearly distributed points can be used, I think. To use different distributions, one must 
-use the traditional method as adapted from standard numerical integration. 
+use the traditional method as adapted from standard numerical integration.  
 
-![MCint.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCint.png)
+This script uses importance sampling with distributions seen in the legend, and the result of their integration. For this function, the integral is 333.33... analytically.
+
+
+![MCint.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCis.png)
 
 ## Ising model
 This 2D Ising model sets up a square lattice with each site representing an electron spin with direction up +1 or down -1. Ferromagnetic behavior shows when there's a  
