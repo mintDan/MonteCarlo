@@ -18,6 +18,11 @@ The script MCint3.py uses importance sampling with distributions seen in the leg
 
 ![MCint.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCis.png)
 
+Another way of variance reduction is by stratified sampling. Even if you only split twice and give half the amount of points to each stratum, you'll still learn more about the integral compared to
+during a crude MC integration. The cost of gaining the extra knowledge, despite keeping same points N in total, and giving N/2 to each stratum, is some extra computation. No free meal, but pretty close!
+
+![MCSS.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCSS.png)
+
 ## Ising model
 This 2D Ising model sets up a square lattice with each site representing an electron spin with direction up +1 or down -1. Ferromagnetic behavior shows when there's a  
 majority of spin either up or down, which can happen at a low temperature. At high temperature the thermal disturbances will randomize the direction of the magnetic dipoles(electron spin)  
