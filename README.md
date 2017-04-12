@@ -4,8 +4,9 @@ Some scripts based on Monte Carlo methods.
 1. [MC integration](https://github.com/mintDan/MonteCarlo#mc-integration)
 2. [Ising model](https://github.com/mintDan/MonteCarlo#ising-model)
 3. [Random Walk method](https://github.com/mintDan/MonteCarlo#random-walk-method)
-4. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
-5. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
+4. [Radioactive Decay](https://github.com/mintDan/MonteCarlo#radioactive-decay)
+5. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
+6. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
 
 
 ## MC integration
@@ -79,6 +80,15 @@ The epsilon that is used for detection when the walk is close to a boundary shou
 
 ![WalkOnSpheres.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/WalkOnSpheresSubplot.png)
 
+## Random Walk method
+Simulating radioactive decay with MC method. The decay constant with the time interval gives the probability that a nucleus will decay, but it is really an approximation for small enough time intervals.  
+With a short enough time step and large amount of initial nuclei, the curve will fitter to the theoretical curve better, and once we reach low amount of cores, the stochastic nature will show itself, since the exponential solution is really only an approximation.
+
+![TourDuWino.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/RD.png)
+
+For the first timestep, the expected number of decays is constant, so taking the number of decays from 1000 experiments, we see a poisson distributions of the decays, since the probability of decay is small.
+
+![TourDuWino.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/DecaysBar.png)
 
 ## MC calculate pi
 Compares the amount of points landing inside and outside the circle, which together with the area outside, gives an approximation for pi.
@@ -86,7 +96,7 @@ As seen here the result is pi = 2.9.
 
 ![MCpi.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCpi.png)
 
-##Buffon's Needle Normal Distribution
+## Buffon's Needle Normal Distribution
 Instead of using a uniform distribution to throw the needle, here are normal distributed needles. 
 Pi can still be calculated explicitly, but an approximation to the probability is used in practice, since the normal distribution in essence goes to +- infinity.
 The approximated probability P to land near the lines is given below
