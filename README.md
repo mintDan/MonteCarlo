@@ -80,7 +80,7 @@ The epsilon that is used for detection when the walk is close to a boundary shou
 
 ![WalkOnSpheres.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/WalkOnSpheresSubplot.png)
 
-## Random Walk method
+## Radioactive Decay
 Simulating radioactive decay with MC method. The decay constant with the time interval gives the probability that a nucleus will decay, but it is really an approximation for small enough time intervals.  
 With a short enough time step and large amount of initial nuclei, the curve will fitter to the theoretical curve better, and once we reach low amount of cores, the stochastic nature will show itself, since the exponential solution is really only an approximation.
 
