@@ -84,11 +84,15 @@ The epsilon that is used for detection when the walk is close to a boundary shou
 Simulating radioactive decay with MC method. The decay constant with the time interval gives the probability that a nucleus will decay, but it is really an approximation for small enough time intervals.  
 With a short enough time step and large amount of initial nuclei, the curve will fitter to the theoretical curve better, and once we reach low amount of cores, the stochastic nature will show itself, since the exponential solution is really only an approximation.
 
-![TourDuWino.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/RD.png)
+![RD.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/RD.png)
 
 For the first timestep, the expected number of decays is constant, so taking the number of decays from 1000 experiments, we see a poisson distributions of the decays, since the probability of decay is small.
 
-![TourDuWino.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/DecaysBar.png)
+![RDpoisson.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/DecaysBar.png)
+
+We can also simulate a chain reaction, nuclei X -> nuclei Y, where nuclei Y also are unstable. Starting with X = 1000 and Y = 0, we have a system of coupled differential equations.
+
+![RDchaun.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/RDchain.png)
 
 ## MC calculate pi
 Compares the amount of points landing inside and outside the circle, which together with the area outside, gives an approximation for pi.
