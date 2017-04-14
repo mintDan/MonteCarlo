@@ -5,8 +5,9 @@ Some scripts based on Monte Carlo methods.
 2. [Ising model](https://github.com/mintDan/MonteCarlo#ising-model)
 3. [Random Walk method](https://github.com/mintDan/MonteCarlo#random-walk-method)
 4. [Radioactive Decay](https://github.com/mintDan/MonteCarlo#radioactive-decay)
-5. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
-6. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
+5. [Particles in a box](https://github.com/mintDan/MonteCarlo#particles-in-a-box)
+6. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
+7. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
 
 
 ## MC integration
@@ -90,6 +91,13 @@ For the first timestep, the expected number of decays is constant, so taking the
 We can also simulate a chain reaction, nuclei X -> nuclei Y, where nuclei Y also are unstable. Starting with X = 1000 and Y = 0, we have a system of coupled differential equations.
 
 ![RDchaun.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/RDchain.png)
+
+
+## Particles in a box
+We can simulate diffusion by statistical methods, instead of keeping track of a big phase space, the positions and velocities of each particle, and calculating collisions, momentum conservations etc. Starting with all particles in the left half, there is a probability that the particles will go to the right.
+Likewise, for particles in the right half, they have a probability to go to the left half. The probabilities will converge to each other, and we reach an equilibrium state.
+
+![Box.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Box.png)
 
 ## MC calculate pi
 Compares the amount of points landing inside and outside the circle, which together with the area outside, gives an approximation for pi.
