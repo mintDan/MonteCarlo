@@ -144,6 +144,11 @@ BinScatterX = [int(x) for x in range(len(BinScatterY))]
 #=======================================
 #Figure 1
 Ntheo = Nstart*np.exp(-Lambda*t)
+fig = plt.figure(figsize=plt.figaspect(0.5))
+
+#fig.suptitle("MC", fontsize=16)
+
+ax = fig.add_subplot(121)
 
 plt.plot(t,Nparticles,color="black")
 plt.plot(t,Ntheo,color="red")
@@ -151,8 +156,34 @@ plt.xlabel("time")
 plt.ylabel("N particles")
 plt.title("Monte Carlo simulation of Radioactive Material")
 plt.legend(["Monte Carlo","Theoretical"])
-plt.savefig('RD.png', bbox_inches='tight')
+#plt.savefig('RD.png', bbox_inches='tight')
+#plt.show()
+
+
+
+#==========================================
+#Figure 4, scatter
+
+#Nx = [int(x) for x in range(int(DecayValuesSum.min()),int(DecayValuesSum.max()))]
+Nx = np.linspace(int(DecayValuesSum.min()),int(DecayValuesSum.max()),20)
+mu = Lambda*Nstart*dt
+#Dtheo = Nstart*np.array([(mu**nx)*np.exp(-mu)/scipy.misc.factorial(nx) for nx in Nx])
+Dtheo = Nexperiments*(mu**Nx)*np.exp(-mu)/scipy.misc.factorial(Nx)
+
+ax = fig.add_subplot(122)
+#plt.scatter(BinScatterX,BinScatterY,color="black")
+
+plt.bar(BinScatterX,BinScatterY,color="black")
+plt.plot(Nx,Dtheo,color="red")
+plt.title("Poisson distribution of Decays")
+plt.xlabel("Decays")
+plt.ylabel("Counts")
+plt.legend(["Expected Poisson","Monte Carlo test"])
+plt.savefig('MCdecay.png', bbox_inches='tight')
+
 plt.show()
+
+
 
 #=======================================
 #Figure 2
@@ -171,7 +202,7 @@ avg = np.average(DecayValues)
 Dtheo = (1.0/np.sqrt(2*sigma**2*np.pi))*np.exp(-(Nx-avg)**2/(2*sigma**2))
 
 #Kan måske også tage Nstart som scale?
-plt.figure(2)
+plt.figure(3)
 #plt.hist(DecayValues,normed=True)
 plt.hist(DecayValues,normed=True)
 #plt.hist(DecayValuesSingle)
@@ -186,28 +217,7 @@ plt.show()
 #==========================================
 #Figure 3
 
-plt.figure(3)
+plt.figure(4)
 plt.hist(DecayValuesSum)#,normed=True)
 plt.show()
 
-#==========================================
-#Figure 4, scatter
-
-#Nx = [int(x) for x in range(int(DecayValuesSum.min()),int(DecayValuesSum.max()))]
-Nx = np.linspace(int(DecayValuesSum.min()),int(DecayValuesSum.max()),20)
-mu = Lambda*Nstart*dt
-#Dtheo = Nstart*np.array([(mu**nx)*np.exp(-mu)/scipy.misc.factorial(nx) for nx in Nx])
-Dtheo = Nexperiments*(mu**Nx)*np.exp(-mu)/scipy.misc.factorial(Nx)
-
-plt.figure(4)
-#plt.scatter(BinScatterX,BinScatterY,color="black")
-
-plt.bar(BinScatterX,BinScatterY,color="black")
-plt.plot(Nx,Dtheo,color="red")
-plt.title("Poisson distribution of Decays")
-plt.xlabel("Decays")
-plt.ylabel("Counts")
-plt.legend(["Expected Poisson","Monte Carlo test"])
-plt.savefig('DecaysBar.png', bbox_inches='tight')
-
-plt.show()
