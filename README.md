@@ -99,6 +99,12 @@ Likewise, for particles in the right half, they have a probability to go to the 
 
 ![Box.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Box.png)
 
+### Animation for 1D diffusion, comparison MonteCarlo with analytical solution
+
+The script MCboxwalk.py simulates diffusion of particles with a random walk. Each point has a 25% chance to go either left or right, and 50% chance to stay in place. The end result is much like what is seen from particle diffusion.
+
+![BoxAnim.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/BoxAnim.png)
+
 ## MC calculate pi
 Compares the amount of points landing inside and outside the circle, which together with the area outside, gives an approximation for pi.
 As seen here the result is pi = 2.9.
