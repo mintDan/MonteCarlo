@@ -6,7 +6,7 @@ Some scripts based on Monte Carlo methods.
 3. [Random Walk method](https://github.com/mintDan/MonteCarlo#random-walk-method)
 4. [Radioactive Decay](https://github.com/mintDan/MonteCarlo#radioactive-decay)
 5. [Particles in a box](https://github.com/mintDan/MonteCarlo#particles-in-a-box)
-6. [Approximate Pi](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
+6. [Approximate Pi, Multiprocessing](https://github.com/mintDan/MonteCarlo#mc-calculate-pi)
 7. [Buffon's Needle with normal distribution](https://github.com/mintDan/MonteCarlo#buffons-needle-normal-distribution)
 
 
@@ -105,7 +105,7 @@ The script MCboxwalk.py simulates diffusion of particles with a random walk. Eac
 
 ![BoxAnim.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/BoxAnim.png)
 
-## MC calculate pi
+## Approximate Pi, Multiprocessing
 Compares the amount of points landing inside and outside the circle, which together with the area outside, gives an approximation for pi.
 As seen here the result is pi = 2.9.
 
