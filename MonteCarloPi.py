@@ -177,7 +177,7 @@ if __name__ == "__main__":
     # http://docs.python.org/library/multiprocessing.html#module-multiprocessing.pool
 	pool = Pool(processes=np)   
 	# parallel map
-	#count=pool.map(monte_carlo_pi_part, part_count)
+	#count=pool.map(RunMonteCarloMP, part_count)
 	count = pool.apply_async(RunMonteCarloMP)
 	
 	#print("Esitmated value of Pi:: ", sum(count)/(n*1.0)*4)
