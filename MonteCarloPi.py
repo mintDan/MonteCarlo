@@ -74,7 +74,7 @@ def RunMonteCarlo():
 #==========================================
 #MP MC
 #@TimingCode
-def monte_carlo_pi_part(): #normalt tager den n
+def RunMonteCarloMP(): #normalt tager den n
 	"""
 	Hello there!!!
 	"""
@@ -167,7 +167,7 @@ if __name__ == "__main__":
 	#Plot 
 	#PlotStuff()
 	np = multiprocessing.cpu_count()
-	print("You have {0:1d} CPUs".format(np))
+	print("Number of CPUs: {0:1d}".format(np))
 	# Nummber of points to use for the Pi estimation
 	n = 10000000
 	# iterable with a list of points to generate in each worker
@@ -178,7 +178,7 @@ if __name__ == "__main__":
 	pool = Pool(processes=np)   
 	# parallel map
 	#count=pool.map(monte_carlo_pi_part, part_count)
-	count = pool.apply_async(monte_carlo_pi_part)
+	count = pool.apply_async(RunMonteCarloMP)
 	
 	#print("Esitmated value of Pi:: ", sum(count)/(n*1.0)*4)
 	ntemp = int(10000000/4)
