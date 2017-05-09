@@ -74,10 +74,12 @@ def RunMonteCarlo():
 #==========================================
 #MP MC
 #@TimingCode
-def monte_carlo_pi_part(n):
+def monte_carlo_pi_part(): #normalt tager den n
 	"""
 	Hello there!!!
 	"""
+	
+	n = int(10000000/4)
 	count = 0
 	for i in range(n):
 		x = np.random.uniform()
@@ -175,5 +177,9 @@ if __name__ == "__main__":
     # http://docs.python.org/library/multiprocessing.html#module-multiprocessing.pool
 	pool = Pool(processes=np)   
 	# parallel map
-	count=pool.map(monte_carlo_pi_part, part_count)
-	print("Esitmated value of Pi:: ", sum(count)/(n*1.0)*4)
+	#count=pool.map(monte_carlo_pi_part, part_count)
+	count = pool.apply_async(monte_carlo_pi_part)
+	
+	#print("Esitmated value of Pi:: ", sum(count)/(n*1.0)*4)
+	ntemp = int(10000000/4)
+	print(count.get()/(ntemp)*4)
