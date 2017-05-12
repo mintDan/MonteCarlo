@@ -90,6 +90,31 @@ def RunMonteCarloMP(): #normalt tager den n
 			count=count+1
 	return count
 
+	
+	
+def RunMonteCarloMP2(n):
+	"""
+	Hello there!!!
+	"""
+	#inse = np.array([])
+	#inse = np.array([],dtype=bool)
+	inside = 0
+	
+	xg = np.random.uniform(-1, 1, size=n)
+	yg = np.random.uniform(-1, 1, size=n)
+	
+	b = 0.5
+	r=np.sqrt(b**2)
+	rsqrd = r*r
+	
+	#Måske er det muligt at bruge array[xg*xg+yg*yg <= rsqrd], i stedet for for loop
+	
+	
+	for i in range(n):
+		if xg[i]*xg[i]+yg[i]*yg[i] <= rsqrd:
+			inside+=1
+
+	return inside
 
 #==========================================
 #To plot the function
@@ -166,16 +191,16 @@ if __name__ == "__main__":
 	#=====================================================
 	#Plot 
 	#PlotStuff()
-	np = multiprocessing.cpu_count()
-	print("Number of CPUs: {0:1d}".format(np))
+	numberp = multiprocessing.cpu_count()
+	print("Number of CPUs: {0:1d}".format(numberp))
 	# Nummber of points to use for the Pi estimation
 	n = 10000000
 	# iterable with a list of points to generate in each worker
 	# each worker process gets n/np number of points to calculate Pi from
-	part_count=[int(n/np) for i in range(np)]
+	split_n =[int(n/numberp) for i in range(numberp)]
 	#Create the worker pool
     # http://docs.python.org/library/multiprocessing.html#module-multiprocessing.pool
-	pool = Pool(processes=np)   
+	pool = Pool(processes=numberp)   
 	# parallel map
 	#count=pool.map(RunMonteCarloMP, part_count)
 	count = pool.apply_async(RunMonteCarloMP)
@@ -183,3 +208,25 @@ if __name__ == "__main__":
 	#print("Esitmated value of Pi:: ", sum(count)/(n*1.0)*4)
 	ntemp = int(10000000/4)
 	print(count.get()/(ntemp)*4)
+	
+	
+	#Med apply_async skal man også bruge .get() bagefter
+	#inside = pool.apply_async(RunMonteCarloMP2)
+	
+	
+	#Okay, så function i pool.map() kan ikke se guesses... Så, xg,yg skal defines inde i function i guess
+	#Så, med pool.map kan den ikke se global varialbes eller hvad? KUn ting der bliver passed til function, og defined inde i function?
+	#Ah, inside er jo nok en list her... en list med 4 numbers, fordi arg er part_count som har 4 items
+	inside = pool.map(RunMonteCarloMP2, split_n)
+	print(inside)
+	inside = np.sum(inside)
+	
+	
+	P = inside/n
+	print('Probability to land inside circle')
+	print(P)
+	
+	Pi = P*(x1-x0)*(y1-y0)/(r**2)
+	print('Approximated Pi')
+	print('Pi={}'.format(Pi))
+	
