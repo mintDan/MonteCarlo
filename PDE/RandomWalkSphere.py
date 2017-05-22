@@ -25,6 +25,74 @@ for i in range(nx):
 	Boundary.append([0,y[i],0])
 	Boundary.append([1,y[i],0])
 
+
+def FindDomainSize(dmax,dmaxpoints):
+	"""
+	The longest distance between two points on the boundary gives a measure of the domain of random points we should throw
+	
+	"""
+	indexi = 0
+	indexj = 0
+	for i in range(nx):
+		for j in range(nx):
+			dij = np.sqrt((Boundary[i][0]-Boundary[j][0])**2+(Boundary[i][1]-Boundary[j][1])**2)
+			if dij > dmax:
+				dmax = dij
+				indexi = i
+				indexj = j
+	dmaxpoints.append(Boundary[indexi])
+	dmaxpoints.append(Boundary[indexj])
+	return dmax, dmaxpoints
+dmax = np.sqrt((Boundary[0][0]-Boundary[1][0])**2+(Boundary[0][1]-Boundary[1][1])**2)
+dmaxpoints = []
+dmax, dmaxpoints = FindDomainSize(dmax,dmaxpoints)
+print(dmax)
+print(dmaxpoints)
+	
+cmx = 0.5*(dmaxpoints[0][0]+dmaxpoints[1][0])
+cmy = 0.5*(dmaxpoints[0][1]+dmaxpoints[1][1])
+print(cmx,cmy)
+
+
+testx = 0.5
+testy = 0.5
+
+def SeeIfPointIsInsidePolygon(x,y):
+
+	xmax = 1
+	xmin = 0
+	ymax = 1
+	ymin = 0
+	#Lad os lave en lige streg fra testx, som går vandret.
+	#Den lige streg kører mod højre.
+	#Dvs, vi skal tjekke, hvor mange gange en cross boundary, fra testx hen til xmax
+	
+	#Jeg går mod højre...
+	#Jeg skal sådan set have...
+	#Hmm... jeg HAR jo boundary points...
+	#JEg skal lave en straight line fra testx og hen til xmax+0.1 let's say
+	#Så jeg kan fx tjekke alle x-values på boundary, fra testx og hen til xmax+0.1
+	for i in range(nx):
+		#hvis x værdi af boundary er større end testx, så har vi en potential boundary, alt efter y
+		if boundary[i][0] > testx
+			#Vi har en candidate...
+			
+	
+	#Jeg kunne også lave en boundary med identity, sequential identity...
+	#så, vi order points 0 -> nx... og to consecutive points ligger lige ved siden af hinanden på boundary...
+	#Så ville det fx være boundary points 49 og 50 som vi ville lave en straight line mellem,
+	#boundary[49][0] = x1
+	#boundary[50][0] = x2
+	#boundary[49][1] = y1
+	#boundary[50][1] = y2
+	#Lave en straight line ud fra disse to
+	
+	
+	#Faktisk, så er det ikke altid at man bruger boundary points > testx,
+	#man kan forestille nogen tilfælde hvor der faktisk skal bruges et enkelt boundary x point < testx...
+	#
+	
+	
 #print(Boundary)
 	
 npoints = 75
@@ -33,7 +101,6 @@ nsteps = 2000
 
 # will have data [x,y,U(x,y)]
 Upoints = []
-
 for n in range(npoints):
 	
 	#Here we pick a point on the grid
@@ -107,7 +174,7 @@ for n in range(npoints):
 	for FoundBpoint in FoundBoundaries:
 		Uestimate += FoundBpoint[2]
 	Uestimate *= 1/len(FoundBoundaries)
-	print(len(FoundBoundaries))
+	#print(len(FoundBoundaries))
 	Upoints.append([xrandom,yrandom,Uestimate])
 		
 
