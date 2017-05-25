@@ -12,7 +12,7 @@ T = 0.5
 dT = 0.15
 Nt = 30
 J = 1# J > 0 gives ferromagnetism
-ntest = 10 #Amount of Monte Carlo runs we do for EACH temperature. To weed out local minimum effects
+ntest = 15 #Amount of Monte Carlo runs we do for EACH temperature. To weed out local minimum effects
 
 #indices = [i for i in range(nx)]
 
@@ -227,9 +227,22 @@ for nt in range(Nt):
 	#T changes each timestep, so we also calculate these each timestep
 	PreCalcExp = [np.exp(-(i-8.0)/T) for i in range(17)]
 	
+	
+	
+	#==================================================================
+	#For autocorrelation
+	mt0 = 0
+	m2t0 = 0
+	mt = 0
+	mt0mt = 0
+	
 	#==================================================================
 	#Fordi noget med at bad initial conditions kan give local minim..
 	#ntest is the number of times i run the simulation at the SAME temperature, to average results
+	#this for loop can perhaps be multiprocessed/parallized?
+	#Because, each test is independent
+	#So, could call 4 tests at once
+	
 	for navg in range(ntest):
 		
 		
@@ -300,6 +313,27 @@ for nt in range(Nt):
 				if x <= P:
 					S[randj,randi] *= -1
 					
+			#=========================================================
+			#Values for autocorrelation
+			#if nt == Nt-1:
+				#Do autocorrelation
+				#I need values at t0, let's do it for magnetization made
+				#let's say it's at timestep 200 i call it t0
+				#So, the time is an n index and obviously has to be somewhere in the MONTECARLO LOOP.
+				#So, i actually do make a counter for n in the monte carlo loop, so
+			if n == 200:
+				mt0current = np.abs(np.sum(S))
+				
+				mt0 += mt0current
+				m2t0 += mt0current*mt0current
+			
+			if n == 300:
+				mtcurrent = np.abs(np.sum(S))
+				mt += mtcurrent
+				
+				mt0mt += mt0current*mtcurrent
+				
+
 			
 			#=========================================================
 			#Here I count succesive equilibrium states,
@@ -352,7 +386,9 @@ for nt in range(Nt):
 				else:
 					Meqold = Meq
 			
-			n += 1	
+			n += 1
+			
+			
 		#The first, inner average of M**2
 		#This is the average of samples from the same MC run. We get 10 samples from each MC run, after the configuration has reached equilibrium
 		MavgMC *= (1/Avgcount)
@@ -365,7 +401,8 @@ for nt in range(Nt):
 		#E2calcavg *= (1.0/20.0)
 
 		
-
+		#==================================================================
+		#What happens here?
 		#Calculate Energies, jeg venter med at divide med N til sidst, pga E2avg
 		#Etotal = CalcH(S)
 		
@@ -408,7 +445,8 @@ for nt in range(Nt):
 	
 	#================================================
 	#The energy E and magnetizaion M, etc, for this GIVEN temperature T is calculated.
-	#We have done e.g ntest = 10 MC runs at the same temperature, and at each MC run we did e.g Avgcount = 10 succesive samples after reaching equilibrium
+	#We have done e.g ntest = 10 MC runs at the same temperature,
+	#and at each MC run we did e.g Avgcount = 10 succesive samples after reaching equilibrium
 	E = Eavg/ntest
 	E2 = E2avg/ntest
 	
@@ -432,6 +470,7 @@ for nt in range(Nt):
 	
 	#==============================
 	#Energy and magnetization pr spinsite
+	#After having used E,M for XT and Cv, now we can divide by N
 	E = E/N
 	M = M/N
 		
@@ -453,6 +492,46 @@ for nt in range(Nt):
 	Cvs.append(Cv)
 	T += dT
 	
+	
+	#mt0 = 0
+	#m2t0 = 0
+	#mt = 0
+	#mt0mt = 0
+	
+	#==========================================
+	#Let's try do see some Autocorrelation, first for last timestep
+	#for ntest in range(Ntest):
+	#	for nmc in range(BigNmc):
+	#		if nt == Nt-1:
+				#Do autocorrelation
+				#I need values at t0, let's do it for magnetization made
+				#let's say it's at timestep 200 i call it t0
+				#So, the time is an n index and obviously has to be somewhere in the MONTECARLO LOOP.
+				#So, i actually do make a counter for n in the monte carlo loop, so
+	#			if n == 200:
+	#				mt0current = np.abs(np.sum(S))
+	#				
+	#				mt0 += mt0current
+	#				m2t0 += mt0current*mt0current
+				
+	#			if n == 300:
+	#				mtcurrent = np.abs(np.sum(S))
+	#				mt += mtcurrent
+					
+	#				mt0mt += mt0current*mtcurrent
+				
+	mt0avg = mt0/ntest
+	m2t0avg = m2t0/ntest
+	mtavg = mt/ntest
+	
+	mt0mtavg = mt0mt/ntest
+	
+	Cmt = (mt0mtavg-mt0avg*mtavg)/(m2t0avg-mt0avg*mt0avg)
+	#print(Cmt)
+	
+	
+	Cmt2 = (mt0mtavg-mt0avg*mt0avg)/(m2t0avg-mt0avg*mt0avg)
+	print(Cmt, Cmt2)
 	
 	#==========================================
 	#What data do other get?
