@@ -12,7 +12,7 @@ T = 0.5
 dT = 0.15
 Nt = 30
 J = 1# J > 0 gives ferromagnetism
-ntest = 10
+ntest = 10 #Amount of Monte Carlo runs we do for EACH temperature. To weed out local minimum effects
 
 #indices = [i for i in range(nx)]
 
@@ -38,6 +38,9 @@ M = np.sum(S)
 
 
 def CalcH(S):
+	"""
+	Calculates Hamiltonian, but this is inefficient. Rather the function Esiteflip(S,i,j) is used
+	"""
 	
 	H = 0
 	
@@ -195,8 +198,8 @@ PreCalcExp = [np.exp(-(i-8.0)/T) for i in range(17)]
 #print(PreCalcExp)
 
 
-#################################################
-#Make (T,M) graph
+#======================================================
+#Make (T,M) graph etc. For each temperature T, we add the final averaged out M,E,XT,Cv
 Ms = []
 Es = []
 XTs = []
@@ -204,11 +207,12 @@ Cvs = []
 Ts = []
 
 
-
+#The main outer loop changes the temperature, so Nt is the number of different temperatures we examine
 for nt in range(Nt):
+
 	
 	
-	
+	#==================================================================
 	#These will be averaged out over ntest times...
 	#With independent starting points
 	Eavg = 0
@@ -217,32 +221,50 @@ for nt in range(Nt):
 	E2avg = 0
 	
 	
-	
+	#==================================================================
 	#Precalculated exponenstial, for every T, for more efficiency
 	#Right now i make 17, but there's only 5 i think! Because of 2* faktor, so only even numbers
+	#T changes each timestep, so we also calculate these each timestep
 	PreCalcExp = [np.exp(-(i-8.0)/T) for i in range(17)]
 	
+	#==================================================================
 	#Fordi noget med at bad initial conditions kan give local minim..
 	#ntest is the number of times i run the simulation at the SAME temperature, to average results
 	for navg in range(ntest):
-	
+		
+		
+		#==================================================================
+		#Here I make the initial spin state. If T < Tcritical, i make fully aligned state of ones, else i make a random state of {-1,1}
+		
 		#randomS(S)
 		if T < 2.2:
 			S = np.ones((ny,nx))
+
+	
 		else:
 			#If val of index = 0, then we go to -1, if val of index = 2, then we get 1.
 			S = 2*np.random.randint(0,2,(ny,nx))-1
+			
+			
 		#print(S)
 		
 		#Lige her bør jeg faktisk lave en endnu en loop
+		
+		#Der bør være en Meqold = 0 og 1, 0 for T > Tcrit, det er mere efficient, så vi tager Meqold som givet ud fra initial state her
+		#Det er mere flexible
+		#Meqold = 1
+		Meqold = np.abs(np.sum(S))
+		if Meqold == 0:
+			#Jeg må ikke have division by 0 error
+			Meqold = 0.1
 		
 		
 		MEquilibriumCount = 0
 		#100*N = 100*625 = 62500
 		#E2calcavg = 0
 		
-		#Well i can't have division by 0 error, so...
-		Mlasteq = 1
+
+		
 		
 		#I need to make an average of M*M for <M**2>
 		#And later, I need to make an average of THESE aswell, with 1/ntest faktor
@@ -254,8 +276,12 @@ for nt in range(Nt):
 		EavgMC = 0
 		E2avgMC = 0
 		
-		
-		for n in range(150*N):
+		#================================================
+		#This is the actual MonteCarlo loop, changing the configuration based on probabilities
+		#This should perhaps be a while loop instead... while Avgcount < 10
+		n = 0
+		while Avgcount < 10:
+		#for n in range(150*N):
 			randi = np.random.randint(0,nx)
 			randj = np.random.randint(0,nx)
 
@@ -275,16 +301,22 @@ for nt in range(Nt):
 					S[randj,randi] *= -1
 					
 			
+			#=========================================================
 			#Here I count succesive equilibrium states,
 			#It needs to "remember" at least 2 magnetizations, the current and the last
 			#Can be made more advanced, but that's the simplest
+			#Samples at N,2N,3N,4N... monte carlo steps
 			if n%N == 0:
 			
-				#We only measure M during full Monte Carlo Sweeps
+				#We only measure M during full Monte Carlo Sweeps, every N steps iirc
+				
 				Meq = np.abs(np.sum(S))
-				if Mlasteq != 0:
-					if np.abs(Meq/(Mlasteq*100)) < 5:
-						#The last state is within 5% of the current, so we have an Equilibrium count
+				if Meqold != 0:
+					
+					#Tror denne her skal ændres tbh? Hvis jeg vil sammenligne to ting, så er det (a-b)/b tror jeg?
+					#if np.abs(Meq/(Meqbefore)) < 5:
+					if np.abs((Meq-Meqold)/Meqold) < 0.99:
+					#The last state is within 5% of the current, so we have an Equilibrium count
 						MEquilibriumCount += 1
 						
 					#Reset equilibrium counter
@@ -294,7 +326,11 @@ for nt in range(Nt):
 				
 				if MEquilibriumCount >= 10:
 					#We have reached equilibrium let's say, since the last 10 equilibriums are within 5%
-
+					#On the hand, having many equilibrium counts is good, on the other, sometimes by chance, a state will hit a spike,
+					#even after hitting equilibrium. so if we demand 100 equilibrium counts in a row, there is a good chance that at SOME POINT
+					#during those 100 counts, a subsequent state would have slightly too different, and we would have to start all over with 100 counts.
+					#So 10 seems enough.
+					
 					#For equilibrium counts above 10, we calculate average M2
 					MavgMC += Meq
 					M2avgMC += Meq*Meq
@@ -314,9 +350,11 @@ for nt in range(Nt):
 					break
 					
 				else:
-					Mlasteq = Meq
-				
+					Meqold = Meq
+			
+			n += 1	
 		#The first, inner average of M**2
+		#This is the average of samples from the same MC run. We get 10 samples from each MC run, after the configuration has reached equilibrium
 		MavgMC *= (1/Avgcount)
 		M2avgMC *= (1/Avgcount)
 		E2avgMC *= (1/Avgcount)
@@ -368,7 +406,9 @@ for nt in range(Nt):
 	
 	
 	
-	
+	#================================================
+	#The energy E and magnetizaion M, etc, for this GIVEN temperature T is calculated.
+	#We have done e.g ntest = 10 MC runs at the same temperature, and at each MC run we did e.g Avgcount = 10 succesive samples after reaching equilibrium
 	E = Eavg/ntest
 	E2 = E2avg/ntest
 	
@@ -385,18 +425,37 @@ for nt in range(Nt):
 	#Dette er egentlig Cv pr mass/site
 	#Hvilke values af Cv får de andre?
 	
-	
 	#Lad os køre specific heat uden N... det er jo <E**2>-<E>**2, men IKKE PR SPIN.
 	Cv = (1/T**2)*(E2-E**2)/N
 	#Det kan godt være, at i stedet for np.abs(), skal det være ( )**2
 	
 	
-	
+	#==============================
+	#Energy and magnetization pr spinsite
 	E = E/N
 	M = M/N
+		
 	
 	
+	#Save figure
+	fig = plt.figure()
+	ax = fig.gca()
+	plt.imshow(S, interpolation=None,vmin = -1, vmax = 1,cmap = "jet")
+	ax.set_title('Ising model, Metropolis algorithm')
+	fig.savefig('Ising{0:0.3}.png'.format(T), bbox_inches='tight')
+	plt.close()
 	
+	#Append to lists for plotting later
+	Ms.append(M)
+	Es.append(E)
+	XTs.append(XT)
+	Ts.append(T)
+	Cvs.append(Cv)
+	T += dT
+	
+	
+	#==========================================
+	#What data do other get?
 	#2-dimensional_ising_model
 	#XT i ranges 0-100
 	#Cv i range 0-0.6
@@ -448,24 +507,7 @@ for nt in range(Nt):
 	#E fra 0-(-2)
 	#Cv 0-0.2
 	#X 0-0.1
-	
-	
-	
-	#Save figure
-	fig = plt.figure()
-	ax = fig.gca()
-	plt.imshow(S, interpolation=None,vmin = -1, vmax = 1,cmap = "jet")
-	ax.set_title('Ising model, Metropolis algorithm')
-	fig.savefig('Ising{0:0.3}.png'.format(T), bbox_inches='tight')
-	plt.close()
-	
-	#Append to lists for plotting later
-	Ms.append(M)
-	Es.append(E)
-	XTs.append(XT)
-	Ts.append(T)
-	Cvs.append(Cv)
-	T += dT
+
 
 	
 	
