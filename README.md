@@ -2,7 +2,7 @@
 Some scripts based on Monte Carlo methods.
 
 1. [MC integration](https://github.com/mintDan/MonteCarlo#mc-integration)
-2. [Ising model](https://github.com/mintDan/MonteCarlo#ising-model)
+2. [Ising model, Multiprocessing](https://github.com/mintDan/MonteCarlo#ising-model)
 3. [Random Walk method](https://github.com/mintDan/MonteCarlo#random-walk-method)
 4. [Radioactive Decay](https://github.com/mintDan/MonteCarlo#radioactive-decay)
 5. [Particles in a box](https://github.com/mintDan/MonteCarlo#particles-in-a-box)
@@ -25,10 +25,11 @@ during a crude MC integration. The cost of gaining the extra knowledge, despite 
 
 ![MCSS.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/MCSS.png)
 
-## Ising model
+## Ising model, Multiprocessing
 This 2D Ising model sets up a square lattice with each site representing an electron spin with direction up +1 or down -1. Ferromagnetic behavior shows when there's a  
 majority of spin either up or down, which can happen at a low temperature. At high temperature the thermal disturbances will randomize the direction of the magnetic dipoles(electron spin)  
-such that the magnet becomes a paramagnet, losing its ferromagnetic properties.
+such that the magnet becomes a paramagnet, losing its ferromagnetic properties.  
+Multiprocessing has been used on, gives significant speedup which can probably be improved even further.
 
 ![Ising.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Ising2.45.png)  
 
