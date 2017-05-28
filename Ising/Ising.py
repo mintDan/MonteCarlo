@@ -1166,6 +1166,54 @@ def MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts):
 		#X 0-0.1
 
 
+def PlotValues():
+	
+	fig2 = plt.figure(2)
+	plt.plot(Ts,Ms)
+	plt.xlabel("T")
+	plt.ylabel("m")
+	plt.title("Magnetization")
+	fig2.savefig('Magnetization.png', bbox_inches='tight')
+	plt.show()
+
+	fig3 = plt.figure(3)
+	plt.plot(Ts,Es)
+	plt.xlabel("T")
+	plt.ylabel("E")
+	plt.title("Energy pr spin site")
+	fig3.savefig('Energy.png', bbox_inches='tight')
+	plt.show()
+
+	fig4 = plt.figure(4)
+	plt.plot(Ts,XTs)
+	plt.xlabel("T")
+	plt.ylabel("XT")
+	plt.title("Isothermal Susceptibility")
+	fig4.savefig('Susceptibility', bbox_inches='tight')
+	plt.show()
+
+
+	fig5 = plt.figure(5)
+	plt.plot(Ts,Cvs)
+	plt.xlabel("T")
+	plt.ylabel("Cv")
+	plt.title("Specific heat")
+	fig5.savefig('Specificheat.png', bbox_inches='tight')
+	plt.show()
+
+
+	fig6 = plt.figure(6)
+	tshere = [j for j in range(nautotimes)]
+	plt.plot(tshere,CMts, color="red")
+	plt.plot(tshere,CEts, color="black")
+	plt.legend(["M","E"])
+	plt.title("Autocorrelation")
+	plt.xlabel("n timestep")
+	plt.ylabel("C(n)")
+	fig5.savefig('Autocorrelation.png', bbox_inches='tight')
+	plt.show()
+	
+
 def animate(i): #i increment with 1 each step
 
 	ax.clear()
@@ -1236,6 +1284,7 @@ if __name__ == "__main__":
 	nautotimes = 2000
 	
 	#======================================================
+	#RUN MAINSCRIPT
 	#Make (T,M) graph etc. For each temperature T, we add the final averaged out M,E,XT,Cv
 	Ms = []
 	Es = []
@@ -1257,50 +1306,7 @@ if __name__ == "__main__":
 	
 	#=====================================================
 	#Make plots
-	fig2 = plt.figure(2)
-	plt.plot(Ts,Ms)
-	plt.xlabel("T")
-	plt.ylabel("m")
-	plt.title("Magnetization")
-	fig2.savefig('Magnetization.png', bbox_inches='tight')
-	plt.show()
-
-	fig3 = plt.figure(3)
-	plt.plot(Ts,Es)
-	plt.xlabel("T")
-	plt.ylabel("E")
-	plt.title("Energy pr spin site")
-	fig3.savefig('Energy.png', bbox_inches='tight')
-	plt.show()
-
-	fig4 = plt.figure(4)
-	plt.plot(Ts,XTs)
-	plt.xlabel("T")
-	plt.ylabel("XT")
-	plt.title("Isothermal Susceptibility")
-	fig4.savefig('Susceptibility', bbox_inches='tight')
-	plt.show()
-
-
-	fig5 = plt.figure(5)
-	plt.plot(Ts,Cvs)
-	plt.xlabel("T")
-	plt.ylabel("Cv")
-	plt.title("Specific heat")
-	fig5.savefig('Specificheat.png', bbox_inches='tight')
-	plt.show()
-
-
-	fig6 = plt.figure(6)
-	tshere = [j for j in range(nautotimes)]
-	plt.plot(tshere,CMts, color="red")
-	plt.plot(tshere,CEts, color="black")
-	plt.legend(["M","E"])
-	plt.title("Autocorrelation")
-	plt.xlabel("n timestep")
-	plt.ylabel("C(n)")
-	fig5.savefig('Autocorrelation.png', bbox_inches='tight')
-	plt.show()
+	PlotValues()
 
 	#print(Ms)
 	#print(Ts)
