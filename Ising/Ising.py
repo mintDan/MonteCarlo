@@ -604,8 +604,8 @@ def MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts):
 		#PreCalcExp = np.exp([-(i-8.0)/T for i in range(17)])
 		
 		
-		PreCalcExp = [np.exp(-(2*i-8.0)/T) for i in range(9)]
-		
+		#PreCalcExp = [np.exp(-(2*i-8.0)/T) for i in range(9)]
+		PreCalcExp = np.exp([-(2*i-8.0)/T for i in range(9)])
 		
 		#==================================================================
 		#For autocorrelation
@@ -981,6 +981,195 @@ def MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts):
 		Ts.append(T)
 		Cvs.append(Cv)
 		T += dT
+
+		
+		#==========================================
+		#What data do other get?
+		#2-dimensional_ising_model
+		#XT i ranges 0-100
+		#Cv i range 0-0.6
+		#ENergy pr link 0-(-1)
+		
+		#advancedlab1_Part1
+		#E per site 0-(-2)
+		#Cv specific 0-0.12
+		#X 0-0.3
+		#Nok kun E som er pr site?
+		
+		
+		#AsherIsingModelReport
+		#E pr site 0-(-2)
+		#X 0-0.4
+		#Cv 0-0.2
+		
+		
+		#Chap12_Ising_Model_v04
+		#E pr site 0-(-2)
+		#Cv/N 0-4
+		
+		
+		#Ising (1)
+		#C/N 0-3
+		#E/N 0-(-2)
+		
+		
+		#Ising Model 1
+		#E 0-(-1)
+		#Cv 0-10
+		#XT 0-300
+		
+		
+		#ising_Model
+		#E pr spin 0-(-4)
+		#Cv 0-5000
+		#XT pr spin 0-0.18
+		
+		
+		#lecture6-stat_mech
+		#Cv pr spin 0-2
+		#
+		
+		#SCALAS2013_04_16-17
+		#Cv 0-1.5
+		
+		#Student Ising Swarthmore
+		#E fra 0-(-2)
+		#Cv 0-0.2
+		#X 0-0.1
+		
+def CalcAutocorrelation(T):
+	"""
+	Makes autocorrelation, different temperatures, different observables
+	"""
+	
+	#The main outer loop changes the temperature, so Nt is the number of different temperatures we examine
+	for nt in range(Nt):
+
+		
+		#==================================================================
+		#Precalculated exponenstial, for every T, for more efficiency
+		#Right now i make 17, but there's only 5 i think! Because of 2* faktor, so only even numbers
+		#T changes each timestep, so we also calculate these each timestep
+		#PreCalcExp = [np.exp(-(i-8.0)/T) for i in range(17)]
+		#PreCalcExp = np.exp([-(i-8.0)/T for i in range(17)])
+		
+		
+		#PreCalcExp = [np.exp(-(2*i-8.0)/T) for i in range(9)]
+		PreCalcExp = np.exp([-(2*i-8.0)/T for i in range(9)])
+		
+		#==================================================================
+		#For autocorrelation
+
+		Marray = np.zeros(nautotimes)
+		M2array = np.zeros(nautotimes)
+		
+		Earray = np.zeros(nautotimes)
+		E2array = np.zeros(nautotimes)
+		
+		#==================================================================
+		#Fordi noget med at bad initial conditions kan give local minim..
+		#ntest is the number of times i run the simulation at the SAME temperature, to average results
+		#this for loop can perhaps be multiprocessed/parallized?
+		#Because, each test is independent
+		#So, could call 4 tests at once
+		
+		#Jeg kunne lave en function MCrun()
+		#Som så bliver kaldt ntest gange
+		
+		#Autocorrelation kan måske være lidt svær at have i multiprocess...
+		#Fordi den ændrer jo global array
+		
+		for navg in range(ntest):
+			
+			#==================================================================
+			#Think i should seed each run? WIthout any input it will use current time to seed.
+			np.random.seed()
+			
+			#==================================================================
+			#Here I make the initial spin state. If T < Tcritical, i make fully aligned state of ones, else i make a random state of {-1,1}
+			
+			#randomS(S)
+			if T < 2.2:
+				S = np.ones((ny,nx))
+
+		
+			else:
+				#If val of index = 0, then we go to -1, if val of index = 2, then we get 1.
+				S = 2*np.random.randint(0,2,(ny,nx))-1
+
+
+			#================================================
+			#This is the actual MonteCarlo loop, changing the configuration based on probabilities
+			#This should perhaps be a while loop instead... while Avgcount < 10
+			n = 0
+			while n < nautotimes-1:
+			#for n in range(150*N):
+				randi,randj = np.random.randint(0,nx,2)
+				#randj = np.random.randint(0,ny)
+
+
+				dE = Esiteflip(S,randj,randi,nx,ny)
+			
+				if dE < 0:
+					S[randj,randi] *= -1
+				else:
+					x = np.random.uniform(0,1)
+					
+					#P = np.exp(-dE/T) #PreCalcExp[dH-8]# #Cant use precalculated that well, since we are increasing T
+					#P = PreCalcExp[int(dE)+8]
+					P = PreCalcExp[int((dE+8)/2)]
+					#Hvis dH=0, så tager vi PreCalcExp[8]
+					#P = np.exp(-dH/T)
+					if x <= P:
+						S[randj,randi] *= -1
+						
+				#=========================================================
+				#Values for autocorrelation
+				#if nt == Nt-1:
+					#Do autocorrelation
+					#I need values at t0, let's do it for magnetization made
+					#let's say it's at timestep 200 i call it t0
+					#So, the time is an n index and obviously has to be somewhere in the MONTECARLO LOOP.
+					#So, i actually do make a counter for n in the monte carlo loop, so
+				#if n == 200:
+				#	mt0current = np.abs(np.sum(S))
+					
+				#	mt0 += mt0current
+				#	m2t0 += mt0current*mt0current
+				
+				#if n == 300:
+				#	mtcurrent = np.abs(np.sum(S))
+				#	mt += mtcurrent
+					
+				#	mt0mt += mt0current*mtcurrent
+					
+				
+				#Method 2
+				
+				
+				
+				Mauto = np.abs(np.sum(S))
+				Marray[n] = Mauto
+				M2array[n] = Mauto*Mauto
+				
+				Eauto = CalcH(S,nx,ny,J)
+				Earray[n] = Eauto
+				E2array[n] = Eauto*Eauto
+
+				n += 1
+
+				
+			
+
+	
+		#=================================================================
+		#print some stuff to see progress
+		print("T = {0:.3f}".format(T))
+		
+		
+		#============================
+		#Increment T
+		T+= dT
 		
 		
 		#mt0 = 0
@@ -1051,119 +1240,64 @@ def MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts):
 		#print(C300Method2,C300Method3)
 		
 		#Method 4
-		if nt == Nt-1:
-			
-			#Energy
-			Earrayavg = np.average(Earray)
-			E2arrayavg = np.average(E2array)
-			EX0 = E2arrayavg - Earrayavg*Earrayavg
-			
-			
-			
-			#Magnetization
-			Marrayavg = np.average(Marray)
-			M2arrayavg = np.average(M2array)
-			MX0 = M2arrayavg - Marrayavg*Marrayavg
-			
-			
-			
-			for j in range(nautotimes):
-				#MWeirdsum = 0
-				#MWeirdsum2 = 0
-				#MWeirdsum3 = 0
-				
-				#EWeirdsum = 0
-				#EWeirdsum2 = 0
-				#EWeirdsum3 = 0
-				
-				#Vectorized sums
-				MWeirdsum = np.sum(Marray[:nautotimes-j]*Marray[j:nautotimes])
-				MWeirdsum2 = np.sum(Marray[:nautotimes-j])
-				MWeirdsum3 = np.sum(Marray[j:nautotimes])
-				
-				EWeirdsum = np.sum(Earray[:nautotimes-j]*Earray[j:nautotimes])
-				EWeirdsum2 = np.sum(Earray[:nautotimes-j])
-				EWeirdsum3 = np.sum(Earray[j:nautotimes])
-				
-				#for i in range(nautotimes-j):
-				#	MWeirdsum += Marray[i]*Marray[i+j]
-				#	MWeirdsum2 += Marray[i]
-				#	MWeirdsum3 += Marray[i+j]
-					
-				#	EWeirdsum += Earray[i]*Earray[i+j]
-				#	EWeirdsum2 += Earray[i]
-				#	EWeirdsum3 += Earray[i+j]
-				#	
-					
-				MWeirdsum *= (1.0/(nautotimes-j))
-				MWeirdsum2 *= (1.0/(nautotimes-j))
-				MWeirdsum3 *= (1.0/(nautotimes-j))
-				
-				EWeirdsum *= (1.0/(nautotimes-j))
-				EWeirdsum2 *= (1.0/(nautotimes-j))
-				EWeirdsum3 *= (1.0/(nautotimes-j))
-				#C300Method4 = (Weirdsum - Weirdsum2*Weirdsum3)/X0
-				CMts[j] = (MWeirdsum - MWeirdsum2*MWeirdsum3)/MX0
-				CEts[j] = (EWeirdsum - EWeirdsum2*EWeirdsum3)/EX0
 
-			#print(C300Method4)
+			
+		#Energy
+		Earrayavg = np.average(Earray)
+		E2arrayavg = np.average(E2array)
+		EX0 = E2arrayavg - Earrayavg*Earrayavg
 		
+		
+		
+		#Magnetization
+		Marrayavg = np.average(Marray)
+		M2arrayavg = np.average(M2array)
+		MX0 = M2arrayavg - Marrayavg*Marrayavg
+		
+		
+		
+		for j in range(nautotimes):
+			#MWeirdsum = 0
+			#MWeirdsum2 = 0
+			#MWeirdsum3 = 0
+			
+			#EWeirdsum = 0
+			#EWeirdsum2 = 0
+			#EWeirdsum3 = 0
+			
+			#Vectorized sums
+			MWeirdsum = np.sum(Marray[:nautotimes-j]*Marray[j:nautotimes])
+			MWeirdsum2 = np.sum(Marray[:nautotimes-j])
+			MWeirdsum3 = np.sum(Marray[j:nautotimes])
+			
+			EWeirdsum = np.sum(Earray[:nautotimes-j]*Earray[j:nautotimes])
+			EWeirdsum2 = np.sum(Earray[:nautotimes-j])
+			EWeirdsum3 = np.sum(Earray[j:nautotimes])
+			
+			#for i in range(nautotimes-j):
+			#	MWeirdsum += Marray[i]*Marray[i+j]
+			#	MWeirdsum2 += Marray[i]
+			#	MWeirdsum3 += Marray[i+j]
+				
+			#	EWeirdsum += Earray[i]*Earray[i+j]
+			#	EWeirdsum2 += Earray[i]
+			#	EWeirdsum3 += Earray[i+j]
+			#	
+				
+			MWeirdsum *= (1.0/(nautotimes-j))
+			MWeirdsum2 *= (1.0/(nautotimes-j))
+			MWeirdsum3 *= (1.0/(nautotimes-j))
+			
+			EWeirdsum *= (1.0/(nautotimes-j))
+			EWeirdsum2 *= (1.0/(nautotimes-j))
+			EWeirdsum3 *= (1.0/(nautotimes-j))
+			#C300Method4 = (Weirdsum - Weirdsum2*Weirdsum3)/X0
+			CMts[j,nt] = (MWeirdsum - MWeirdsum2*MWeirdsum3)/MX0
+			CEts[j,nt] = (EWeirdsum - EWeirdsum2*EWeirdsum3)/EX0
 
-		
-		
-		#==========================================
-		#What data do other get?
-		#2-dimensional_ising_model
-		#XT i ranges 0-100
-		#Cv i range 0-0.6
-		#ENergy pr link 0-(-1)
-		
-		#advancedlab1_Part1
-		#E per site 0-(-2)
-		#Cv specific 0-0.12
-		#X 0-0.3
-		#Nok kun E som er pr site?
-		
-		
-		#AsherIsingModelReport
-		#E pr site 0-(-2)
-		#X 0-0.4
-		#Cv 0-0.2
-		
-		
-		#Chap12_Ising_Model_v04
-		#E pr site 0-(-2)
-		#Cv/N 0-4
-		
-		
-		#Ising (1)
-		#C/N 0-3
-		#E/N 0-(-2)
-		
-		
-		#Ising Model 1
-		#E 0-(-1)
-		#Cv 0-10
-		#XT 0-300
-		
-		
-		#ising_Model
-		#E pr spin 0-(-4)
-		#Cv 0-5000
-		#XT pr spin 0-0.18
-		
-		
-		#lecture6-stat_mech
-		#Cv pr spin 0-2
-		#
-		
-		#SCALAS2013_04_16-17
-		#Cv 0-1.5
-		
-		#Student Ising Swarthmore
-		#E fra 0-(-2)
-		#Cv 0-0.2
-		#X 0-0.1
+		#print(C300Method4)
+
+	return
 
 
 def PlotValues():
@@ -1201,7 +1335,7 @@ def PlotValues():
 	fig5.savefig('Specificheat.png', bbox_inches='tight')
 	plt.show()
 
-
+def PlotAutocorrelation():
 	fig6 = plt.figure(6)
 	tshere = [j for j in range(nautotimes)]
 	plt.plot(tshere,CMts, color="red")
@@ -1210,7 +1344,7 @@ def PlotValues():
 	plt.title("Autocorrelation")
 	plt.xlabel("n timestep")
 	plt.ylabel("C(n)")
-	fig5.savefig('Autocorrelation.png', bbox_inches='tight')
+	fig6.savefig('Autocorrelation.png', bbox_inches='tight')
 	plt.show()
 	
 
@@ -1281,7 +1415,7 @@ if __name__ == "__main__":
 	J = 1# J > 0 gives ferromagnetism
 	ntest = 16 #Amount of Monte Carlo runs we do for EACH temperature. To weed out local minimum effects
 	
-	nautotimes = 2000
+	nautotimes = 4000
 	
 	#======================================================
 	#RUN MAINSCRIPT
@@ -1292,26 +1426,54 @@ if __name__ == "__main__":
 	Cvs = []
 	Ts = []
 	
-	#Autocorrelation
-	CEts = np.zeros(nautotimes)
-	CMts = np.zeros(nautotimes)
+
 	
 	
 	#1 for save, 0 for no savefig
 	SaveFig = 0
 	
-	MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts)
+	#MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts)
 	
+	#======================================================
+	#Make Autocorrelations
+	#Should perhaps fit to data also, maybe? so i get the actual time thing.
 	
+	#For autocorrelation, we don't take 10 tests i think, at least in the most simple case
+	#so, ntest = 1 we put it.
+	ntest = 1
+	Nt = 2
+	#Autocorrelation
+	CEts = np.zeros((nautotimes,Nt))
+	CMts = np.zeros((nautotimes,Nt))
+	T = 4.5
+	CalcAutocorrelation(T)
+	#print(CEts)
 	
+	#PlotAutocorrelation()
+	fig6 = plt.figure(6)
+	tshere = [j for j in range(nautotimes)]
+	end = nautotimes
+	#plt.plot(tshere[:end],CMts[:end,0], color="red")
+	#plt.plot(tshere[:end],CEts[:end,0], color="black")
+	
+	plt.plot(tshere[:end],CMts[:end,Nt-1], color="blue",)
+	plt.plot(tshere[:end],CEts[:end,Nt-1], color="black")
+	plt.legend(["M","E"])
+	plt.title("Ising model autocorrelation , T = {}".format(T))
+	plt.xlabel("n timestep")
+	plt.ylabel("C(n)")
+	fig6.savefig('Autocorrelation.png', bbox_inches='tight')
+	plt.show()
 	#=====================================================
 	#Make plots
-	PlotValues()
+	#PlotValues()
 
 	#print(Ms)
 	#print(Ts)
 	#Lige nu der går den til M = +-625... 
 	
+	
+
 	
 	#===============================================================
 	#Animation

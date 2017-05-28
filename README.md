@@ -64,6 +64,11 @@ too high T means the thermal disturbances will be too strong to give any signifi
 The specific heat describes how much the internal energy changes when the temperature changes. We see that the internal energy changes mostly around the critical temperature, which can also be seen from the energy graph.
 Once the magnetization reaches 0, and the energy reaches it's maximum, we basically have random configuration of spins, and increasing T cannot do anything to increase the Energy in this system.
 
+### Autocorrelation
+To have meaningful average values we need independent and uncorrelated data. Since we change the spin states one site at a time, consecutive states are highly correlated and thus any statistics aswell. Looking at the autocorrelation times we get a sense of how many steps should be between each measurement.
+Two statistics can have different correlation times, so the safer practice is to pick the longest correlation time.
+
+![Autocorrelation.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Autocorrelation.png) 
 
 ## Random Walk method
 A partial differential equation can be solved by Random Walk method. Starting from some point, we do N random walks, where each walk ends when we land on a boundary. The value at the boundary is then recorded.
