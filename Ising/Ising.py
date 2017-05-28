@@ -429,29 +429,44 @@ def MCrunParallel(T,N,J,nx,ny,PreCalcExp,out_list):
 			#6/5 = 1 + 1/5
 			#7/5 = 1 + 2/5
 			
+			
+			
 			movingindex = (Sweeps%nmoving)-1
 			
-			Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[movingindex]/nmoving
+			Mmovingavg = np.sum(Mmoving)/nmoving
 			
 			#Skal lige finde ud af det med moving average lidt mere...
 			
-			#Sweeps = 1 -> Mmoving[0] = Mmovingavg + Meq/nmoving - Mmoving[4]
+			#Sweeps = 1 -> Mmoving[0] = Mmovingavg + Meq/nmoving - Mmoving[0]
 			#Sweeps = 2 -> Mmoving[1] = Mmovingavg + Meq/nmoving - Mmoving[3]
 			#Sweeps = 3 -> Mmoving[2] = Mmovingavg + Meq/nmoving - Mmoving[2]
 			#Sweeps = 4 -> Mmoving[3] = Mmovingavg + Meq/nmoving - Mmoving[1]
 			#Sweeps = 5 -> Mmoving[4] = Mmovingavg + Meq/nmoving - Mmoving[0]
+			
 			#Sweeps = 6 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[0]
 			#Sweeps = 7 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[1]
 			#Sweeps = 8 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[2]
 			#Sweeps = 9 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[3]
 			#Sweeps = 10 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[4]
 			#Sweeps = 11 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[0]
+			#Sweeps = 12 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[1]
+			#Sweeps = 13 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[2]
+			#Sweeps = 14 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[3]
+			#Sweeps = 15 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[4]
+			#Sweeps = 16 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[0]
+			#Sweeps = 17 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[1]
+			#Sweeps = 18 -> Mmovingavg = Mmovingavg + Meq/nmoving - Mmoving[2]
+			#
 			
 			
-						
+			
+			#Efter jeg har calculated Mmovingavg, SÅ update jeg Mmoving array.
+			#Fordi ellers så vil den nye value Meq jo være indbygget i average, jeg vil hellere sammenligne ny data point med average
+			#af de gamle data points, fordi den nye datapoint Meq vil skew average hen mod sig selv jo.
 			Mmoving[movingindex] = Meq
 			
-			if Meqold != 0:
+			#if Meqold != 0:
+			if Mmovingavg != 0:
 				#Skal jeg måske lige undersøge hvad der sker, if it so happens, at faktisk Meqold = 0? Men det er ret usandsynligt
 				
 				#Tror denne her skal ændres tbh? Hvis jeg vil sammenligne to ting, så er det (a-b)/b tror jeg?
@@ -465,7 +480,7 @@ def MCrunParallel(T,N,J,nx,ny,PreCalcExp,out_list):
 				#so, for now, add in 2*0.99 factor
 				
 				#if np.abs((Meq-Meqold)/Meqold) < 3*0.99:
-				if np.abs((Meq-Mmovingavg)/Mmovingavg) < 3*0.99:
+				if np.abs((Meq-Mmovingavg)/Mmovingavg) < 2*0.99:
 				#The last state is within e.g 5% of the current, so we have an Equilibrium count
 					MEquilibriumCount += 1
 					
