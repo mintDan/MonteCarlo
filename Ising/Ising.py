@@ -1060,11 +1060,11 @@ def CalcAutocorrelation(T):
 		#==================================================================
 		#For autocorrelation
 
-		Marray = np.zeros(nautotimes)
-		M2array = np.zeros(nautotimes)
+		Marray = np.zeros(tmax)
+		M2array = np.zeros(tmax)
 		
-		Earray = np.zeros(nautotimes)
-		E2array = np.zeros(nautotimes)
+		Earray = np.zeros(tmax)
+		E2array = np.zeros(tmax)
 		
 		#==================================================================
 		#Fordi noget med at bad initial conditions kan give local minim..
@@ -1079,84 +1079,84 @@ def CalcAutocorrelation(T):
 		#Autocorrelation kan måske være lidt svær at have i multiprocess...
 		#Fordi den ændrer jo global array
 		
-		for navg in range(ntest):
+		#for navg in range(ntest):
 			
-			#==================================================================
-			#Think i should seed each run? WIthout any input it will use current time to seed.
-			np.random.seed()
-			
-			#==================================================================
-			#Here I make the initial spin state. If T < Tcritical, i make fully aligned state of ones, else i make a random state of {-1,1}
-			
-			#randomS(S)
-			if T < 2.2:
-				S = np.ones((ny,nx))
-
+		#==================================================================
+		#Think i should seed each run? WIthout any input it will use current time to seed.
+		np.random.seed()
 		
+		#==================================================================
+		#Here I make the initial spin state. If T < Tcritical, i make fully aligned state of ones, else i make a random state of {-1,1}
+		
+		#randomS(S)
+		if T < 2.2:
+			S = np.ones((ny,nx))
+
+	
+		else:
+			#If val of index = 0, then we go to -1, if val of index = 2, then we get 1.
+			S = 2*np.random.randint(0,2,(ny,nx))-1
+
+
+		#================================================
+		#This is the actual MonteCarlo loop, changing the configuration based on probabilities
+		#This should perhaps be a while loop instead... while Avgcount < 10
+		n = 0
+		while n < tmax-1:
+		#for n in range(150*N):
+			randi,randj = np.random.randint(0,nx,2)
+			#randj = np.random.randint(0,ny)
+
+
+			dE = Esiteflip(S,randj,randi,nx,ny)
+		
+			if dE < 0:
+				S[randj,randi] *= -1
 			else:
-				#If val of index = 0, then we go to -1, if val of index = 2, then we get 1.
-				S = 2*np.random.randint(0,2,(ny,nx))-1
-
-
-			#================================================
-			#This is the actual MonteCarlo loop, changing the configuration based on probabilities
-			#This should perhaps be a while loop instead... while Avgcount < 10
-			n = 0
-			while n < nautotimes-1:
-			#for n in range(150*N):
-				randi,randj = np.random.randint(0,nx,2)
-				#randj = np.random.randint(0,ny)
-
-
-				dE = Esiteflip(S,randj,randi,nx,ny)
-			
-				if dE < 0:
+				x = np.random.uniform(0,1)
+				
+				#P = np.exp(-dE/T) #PreCalcExp[dH-8]# #Cant use precalculated that well, since we are increasing T
+				#P = PreCalcExp[int(dE)+8]
+				P = PreCalcExp[int((dE+8)/2)]
+				#Hvis dH=0, så tager vi PreCalcExp[8]
+				#P = np.exp(-dH/T)
+				if x <= P:
 					S[randj,randi] *= -1
-				else:
-					x = np.random.uniform(0,1)
 					
-					#P = np.exp(-dE/T) #PreCalcExp[dH-8]# #Cant use precalculated that well, since we are increasing T
-					#P = PreCalcExp[int(dE)+8]
-					P = PreCalcExp[int((dE+8)/2)]
-					#Hvis dH=0, så tager vi PreCalcExp[8]
-					#P = np.exp(-dH/T)
-					if x <= P:
-						S[randj,randi] *= -1
-						
-				#=========================================================
-				#Values for autocorrelation
-				#if nt == Nt-1:
-					#Do autocorrelation
-					#I need values at t0, let's do it for magnetization made
-					#let's say it's at timestep 200 i call it t0
-					#So, the time is an n index and obviously has to be somewhere in the MONTECARLO LOOP.
-					#So, i actually do make a counter for n in the monte carlo loop, so
-				#if n == 200:
-				#	mt0current = np.abs(np.sum(S))
-					
-				#	mt0 += mt0current
-				#	m2t0 += mt0current*mt0current
+			#=========================================================
+			#Values for autocorrelation
+			#if nt == Nt-1:
+				#Do autocorrelation
+				#I need values at t0, let's do it for magnetization made
+				#let's say it's at timestep 200 i call it t0
+				#So, the time is an n index and obviously has to be somewhere in the MONTECARLO LOOP.
+				#So, i actually do make a counter for n in the monte carlo loop, so
+			#if n == 200:
+			#	mt0current = np.abs(np.sum(S))
 				
-				#if n == 300:
-				#	mtcurrent = np.abs(np.sum(S))
-				#	mt += mtcurrent
-					
-				#	mt0mt += mt0current*mtcurrent
-					
+			#	mt0 += mt0current
+			#	m2t0 += mt0current*mt0current
+			
+			#if n == 300:
+			#	mtcurrent = np.abs(np.sum(S))
+			#	mt += mtcurrent
 				
-				#Method 2
+			#	mt0mt += mt0current*mtcurrent
 				
-				
-				
-				Mauto = np.abs(np.sum(S))
-				Marray[n] = Mauto
-				M2array[n] = Mauto*Mauto
-				
-				Eauto = CalcH(S,nx,ny,J)
-				Earray[n] = Eauto
-				E2array[n] = Eauto*Eauto
+			
+			#Method 2
+			
+			
+			
+			Mauto = np.abs(np.sum(S))
+			Marray[n] = Mauto
+			M2array[n] = Mauto*Mauto
+			
+			Eauto = CalcH(S,nx,ny,J)
+			Earray[n] = Eauto
+			E2array[n] = Eauto*Eauto
 
-				n += 1
+			n += 1
 
 				
 			
@@ -1240,8 +1240,10 @@ def CalcAutocorrelation(T):
 		#print(C300Method2,C300Method3)
 		
 		#Method 4
-
-			
+		
+		#=====================================
+		#De her ting TROR jeg skal bruges til alle metoderne, så dem laver vi bare
+		#Dette er averages OVER ALL TIMES
 		#Energy
 		Earrayavg = np.average(Earray)
 		E2arrayavg = np.average(E2array)
@@ -1255,8 +1257,55 @@ def CalcAutocorrelation(T):
 		MX0 = M2arrayavg - Marrayavg*Marrayavg
 		
 		
+		#Der skal jo være faktor 1/(Nt-t)... Så, hvis Nt = 1000,
+		#og t = 300, men python index for t = 300 er jo 299, så jeg bør velf aktisk tager
+		#1/(Nt-j-1)
 		
-		for j in range(nautotimes):
+		
+		#method 2
+		#http://www.itl.nist.gov/div898/handbook/eda/section3/eda35c.htm
+		Mdenom = np.sum((Marray-Marrayavg)**2)
+		Edenom = np.sum((Earray-Earrayavg)**2)
+		
+		#for i in range(nautotimes):
+			#denom += (Marrayavg
+		
+		for k in range(tmax):
+			#M1M2 = 0
+			#E1E2 = 0
+			#for i in range(nautotimes-k):
+				#M1M2 += Marray[i]*Marray[i+k]
+				#E1E2 += Earray[i]*Earray[i+k]
+			Mnume = np.sum((Marray[:tmax-k]-Marrayavg)*(Marray[k:tmax]-Marrayavg))
+			Enume = np.sum((Earray[:tmax-k]-Earrayavg)*(Earray[k:tmax]-Earrayavg))
+			#M1M2 *= 1/(nautotimes-j-1)
+			#E1E2 *= 1/(nautotimes-j-1)
+			CEts2[k,nt] = Enume/Edenom
+			CMts2[k,nt] = Mnume/Mdenom
+		
+		#method 3 mc_notes2.pdf
+		#Jeg skal bruge C(t) -> 1/nautotimes-t * sum Q_t0Q_to+t
+		#M1M2 = 0
+		#E1E2 = 0
+		for t in range(tmax-1):
+			M1M2 = 0
+			E1E2 = 0
+			for i in range(tmax-t-1):
+				M1M2 += Marray[i]*Marray[i+t+1]
+				E1E2 += Earray[i]*Earray[i+t+1]
+			faktor = 1/(tmax-t-1)
+			M1M2 *= faktor
+			E1E2 *= faktor
+			CEts3[t,nt] = (E1E2-Earrayavg*Earrayavg)/EX0
+			CMts3[t,nt] = (M1M2-Marrayavg*Marrayavg)/MX0
+		
+		#Method 4
+		#Ved ikke helt om den skal gå fra til tmax elelr tmax-1, men jeg tror tmax?
+		#Jeg tror ikke den KAN gå helt op til tmax???
+		#Forid så får man division by 0 in faktor
+		#Kan sgu være jeg bør se lidt på de her faktor og indices
+		#Eller, det kan de jo faktisk heller ikke i math equation der står jo også 1/(tmax-t).. hvis t=tmax så får man division by 0!
+		for k in range(tmax-1):
 			#MWeirdsum = 0
 			#MWeirdsum2 = 0
 			#MWeirdsum3 = 0
@@ -1266,13 +1315,13 @@ def CalcAutocorrelation(T):
 			#EWeirdsum3 = 0
 			
 			#Vectorized sums
-			MWeirdsum = np.sum(Marray[:nautotimes-j]*Marray[j:nautotimes])
-			MWeirdsum2 = np.sum(Marray[:nautotimes-j])
-			MWeirdsum3 = np.sum(Marray[j:nautotimes])
+			MWeirdsum = np.sum(Marray[:tmax-k]*Marray[k:tmax])
+			MWeirdsum2 = np.sum(Marray[:tmax-k])
+			MWeirdsum3 = np.sum(Marray[k:tmax])
 			
-			EWeirdsum = np.sum(Earray[:nautotimes-j]*Earray[j:nautotimes])
-			EWeirdsum2 = np.sum(Earray[:nautotimes-j])
-			EWeirdsum3 = np.sum(Earray[j:nautotimes])
+			EWeirdsum = np.sum(Earray[:tmax-k]*Earray[k:tmax])
+			EWeirdsum2 = np.sum(Earray[:tmax-k])
+			EWeirdsum3 = np.sum(Earray[k:tmax])
 			
 			#for i in range(nautotimes-j):
 			#	MWeirdsum += Marray[i]*Marray[i+j]
@@ -1283,20 +1332,88 @@ def CalcAutocorrelation(T):
 			#	EWeirdsum2 += Earray[i]
 			#	EWeirdsum3 += Earray[i+j]
 			#	
-				
-			MWeirdsum *= (1.0/(nautotimes-j))
-			MWeirdsum2 *= (1.0/(nautotimes-j))
-			MWeirdsum3 *= (1.0/(nautotimes-j))
+			faktor = (1.0/(tmax-k-1))
+			MWeirdsum *= faktor
+			MWeirdsum2 *= faktor
+			MWeirdsum3 *= faktor
 			
-			EWeirdsum *= (1.0/(nautotimes-j))
-			EWeirdsum2 *= (1.0/(nautotimes-j))
-			EWeirdsum3 *= (1.0/(nautotimes-j))
+			EWeirdsum *= faktor
+			EWeirdsum2 *= faktor
+			EWeirdsum3 *= faktor
 			#C300Method4 = (Weirdsum - Weirdsum2*Weirdsum3)/X0
-			CMts[j,nt] = (MWeirdsum - MWeirdsum2*MWeirdsum3)/MX0
-			CEts[j,nt] = (EWeirdsum - EWeirdsum2*EWeirdsum3)/EX0
-
+			CMts4[k,nt] = (MWeirdsum - MWeirdsum2*MWeirdsum3)/MX0
+			CEts4[k,nt] = (EWeirdsum - EWeirdsum2*EWeirdsum3)/EX0
+			
 		#print(C300Method4)
-
+		
+		#method 5 cluster.pdf
+		
+		O2avg = np.average((Marray-Marrayavg)*(Marray-Marrayavg))
+		O2Eavg = np.average((Earray-Earrayavg)*(Earray-Earrayavg))
+		for t in range(tmax-1):
+			Oi = Marray[:tmax-t]-Marrayavg
+			Oit = Marray[t:tmax]-Marrayavg
+			OiOit = np.sum(Oi*Oit)
+			
+			OiE = Earray[:tmax-t]-Earrayavg
+			OitE = Earray[t:tmax]-Earrayavg
+			OiEOitE = np.sum(OiE*OitE)
+			
+			faktor = 1/(tmax-t-1)
+			OiOit *= faktor
+			OiEOitE *= faktor
+			
+			CMts5[t,nt] = OiOit/O2avg
+			CEts5[t,nt] = OiEOitE/O2Eavg
+		
+		
+		#method 6 cs2009.pdf
+		
+		#for i in range(nautotimes):
+			#denom += (Marrayavg
+		
+		for j in range(tmax):
+			#M1M2 = 0
+			#E1E2 = 0
+			#for i in range(nautotimes-k):
+				#M1M2 += Marray[i]*Marray[i+k]
+				#E1E2 += Earray[i]*Earray[i+k]
+			Mnume = np.sum((Marray[:tmax-j]-Marrayavg)*(Marray[j:tmax]-Marrayavg))
+			Enume = np.sum((Earray[:tmax-j]-Earrayavg)*(Earray[j:tmax]-Earrayavg))
+			#M1M2 *= 1/(nautotimes-j-1)
+			#E1E2 *= 1/(nautotimes-j-1)
+			Mdenom = np.sum((Marray[:tmax-j]-Marrayavg)**2)
+			Edenom = np.sum((Earray[:tmax-j]-Earrayavg)**2)
+			
+			CEts6[j,nt] = Enume/Edenom
+			CMts6[j,nt] = Mnume/Mdenom
+			
+		#method 7 cs2009.pdf
+		for j in range(tmax):
+			#M1M2 = 0
+			#E1E2 = 0
+			#for i in range(nautotimes-k):
+				#M1M2 += Marray[i]*Marray[i+k]
+				#E1E2 += Earray[i]*Earray[i+k]
+			Marrayavg = np.average(Marray[:tmax-j])
+			Earrayavg = np.average(Earray[:tmax-j])
+			
+			Mtarrayavg = np.average(Marray[j:tmax])
+			Etarrayavg = np.average(Earray[j:tmax])
+			
+			Mnume = np.sum((Marray[:tmax-j]-Marrayavg)*(Marray[j:tmax]-Mtarrayavg))
+			Enume = np.sum((Earray[:tmax-j]-Earrayavg)*(Earray[j:tmax]-Etarrayavg))
+			#M1M2 *= 1/(nautotimes-j-1)
+			#E1E2 *= 1/(nautotimes-j-1)
+			try:
+				Mdenom = np.sqrt(np.sum((Marray[:tmax-j]-Marrayavg)**2)*np.sum((Marray[j:tmax]-Mtarrayavg)**2))
+				Edenom = np.sqrt(np.sum((Earray[:tmax-j]-Earrayavg)**2)*np.sum((Earray[j:tmax]-Etarrayavg)**2))
+				
+				CEts7[j,nt] = Enume/Edenom
+				CMts7[j,nt] = Mnume/Mdenom
+			except:
+				print(j)
+		
 	return
 
 
@@ -1337,11 +1454,30 @@ def PlotValues():
 
 def PlotAutocorrelation():
 	fig6 = plt.figure(6)
-	tshere = [j for j in range(nautotimes)]
-	plt.plot(tshere,CMts, color="red")
-	plt.plot(tshere,CEts, color="black")
-	plt.legend(["M","E"])
-	plt.title("Autocorrelation")
+	tshere = [j for j in range(tmax)]
+	end = tmax-1
+	plt.axis([0,end,-1.1,1.1])
+	plt.plot(tshere[:end],CMts2[:end,Nt-1], color="red",linestyle="-.")
+	plt.plot(tshere[:end],CEts2[:end,Nt-1], color="black",linestyle="-.")
+	
+	#plt.plot(tshere[:end],CMts3[:end,Nt-1], color="red",linestyle="-")
+	#plt.plot(tshere[:end],CEts3[:end,Nt-1], color="black",linestyle="-")
+	
+	plt.plot(tshere[:end],CMts4[:end,Nt-1], color="red",linestyle="--")
+	plt.plot(tshere[:end],CEts4[:end,Nt-1], color="black",linestyle="--")
+	
+	plt.plot(tshere[:end],CMts5[:end,Nt-1], color="red",linestyle=":")
+	plt.plot(tshere[:end],CEts5[:end,Nt-1], color="black",linestyle=":")
+	
+	plt.plot(tshere[:end],CMts6[:end,Nt-1], color="green",linestyle=":")
+	plt.plot(tshere[:end],CEts6[:end,Nt-1], color="blue",linestyle=":")
+	
+	plt.plot(tshere[:end],CMts7[:end,Nt-1], color="green",linestyle="-")
+	plt.plot(tshere[:end],CEts7[:end,Nt-1], color="blue",linestyle="-")
+	
+	#plt.legend(["M2","E2","M4","E4"])
+	#plt.legend(["M2","E2","M3","E3","M4","E4"])
+	plt.title("Ising model autocorrelation, T = {}".format(T))
 	plt.xlabel("n timestep")
 	plt.ylabel("C(n)")
 	fig6.savefig('Autocorrelation.png', bbox_inches='tight')
@@ -1415,7 +1551,7 @@ if __name__ == "__main__":
 	J = 1# J > 0 gives ferromagnetism
 	ntest = 16 #Amount of Monte Carlo runs we do for EACH temperature. To weed out local minimum effects
 	
-	nautotimes = 4000
+	tmax = 4000
 	
 	#======================================================
 	#RUN MAINSCRIPT
@@ -1441,29 +1577,47 @@ if __name__ == "__main__":
 	#For autocorrelation, we don't take 10 tests i think, at least in the most simple case
 	#so, ntest = 1 we put it.
 	ntest = 1
-	Nt = 2
+	Nt = 1
+	kt = 6
+	tmax = int(kt*1000)
 	#Autocorrelation
-	CEts = np.zeros((nautotimes,Nt))
-	CMts = np.zeros((nautotimes,Nt))
-	T = 4.5
+	CEts2 = np.zeros((tmax,Nt))
+	CMts2 = np.zeros((tmax,Nt))
+	
+	CEts3 = np.zeros((tmax,Nt))
+	CMts3 = np.zeros((tmax,Nt))
+	
+	CEts4 = np.zeros((tmax,Nt))
+	CMts4 = np.zeros((tmax,Nt))
+	
+	CEts5 = np.zeros((tmax,Nt))
+	CMts5 = np.zeros((tmax,Nt))
+	
+	CEts6 = np.zeros((tmax,Nt))
+	CMts6 = np.zeros((tmax,Nt))
+	
+	CEts7 = np.zeros((tmax,Nt))
+	CMts7 = np.zeros((tmax,Nt))
+	
+	T = 3
 	CalcAutocorrelation(T)
 	#print(CEts)
+	PlotAutocorrelation()
+
+	# fig6 = plt.figure(6)
+	# tshere = [j for j in range(nautotimes)]
+	# end = nautotimes
+	# plt.plot(tshere[:end],CMts3[:end,0], color="red",linestyle="-")
+	# plt.plot(tshere[:end],CEts3[:end,0], color="black",linestyle="-")
 	
-	#PlotAutocorrelation()
-	fig6 = plt.figure(6)
-	tshere = [j for j in range(nautotimes)]
-	end = nautotimes
-	#plt.plot(tshere[:end],CMts[:end,0], color="red")
-	#plt.plot(tshere[:end],CEts[:end,0], color="black")
-	
-	plt.plot(tshere[:end],CMts[:end,Nt-1], color="blue",)
-	plt.plot(tshere[:end],CEts[:end,Nt-1], color="black")
-	plt.legend(["M","E"])
-	plt.title("Ising model autocorrelation , T = {}".format(T))
-	plt.xlabel("n timestep")
-	plt.ylabel("C(n)")
-	fig6.savefig('Autocorrelation.png', bbox_inches='tight')
-	plt.show()
+	# plt.plot(tshere[:end],CMts4[:end,Nt-1], color="blue",linestyle="--")
+	# plt.plot(tshere[:end],CEts4[:end,Nt-1], color="black",linestyle="--")
+	# plt.legend(["M","E"])
+	# plt.title("Ising model autocorrelation , T = {}".format(T))
+	# plt.xlabel("n timestep")
+	# plt.ylabel("C(n)")
+	# fig6.savefig('Autocorrelation.png', bbox_inches='tight')
+	# plt.show()
 	#=====================================================
 	#Make plots
 	#PlotValues()
