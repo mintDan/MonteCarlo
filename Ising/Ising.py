@@ -1245,15 +1245,15 @@ def CalcAutocorrelation(T):
 		#De her ting TROR jeg skal bruges til alle metoderne, så dem laver vi bare
 		#Dette er averages OVER ALL TIMES
 		#Energy
-		Earrayavg = np.average(Earray)
-		E2arrayavg = np.average(E2array)
+		Earrayavg = np.sum(Earray)/len(Earray)
+		E2arrayavg = np.sum(E2array)/len(E2array)
 		EX0 = E2arrayavg - Earrayavg*Earrayavg
 		
 		
 		
 		#Magnetization
-		Marrayavg = np.average(Marray)
-		M2arrayavg = np.average(M2array)
+		Marrayavg = np.sum(Marray)/len(Marray)
+		M2arrayavg = np.sum(M2array)/len(Marray)
 		MX0 = M2arrayavg - Marrayavg*Marrayavg
 		
 		
@@ -1264,8 +1264,8 @@ def CalcAutocorrelation(T):
 		
 		#method 2
 		#http://www.itl.nist.gov/div898/handbook/eda/section3/eda35c.htm
-		Mdenom = np.sum((Marray-Marrayavg)**2)
-		Edenom = np.sum((Earray-Earrayavg)**2)
+		Mdenom = np.sum((Marray-Marrayavg)*(Marray-Marrayavg))
+		Edenom = np.sum((Earray-Earrayavg)*(Earray-Earrayavg))
 		
 		#for i in range(nautotimes):
 			#denom += (Marrayavg
@@ -1347,7 +1347,6 @@ def CalcAutocorrelation(T):
 		#print(C300Method4)
 		
 		#method 5 cluster.pdf
-		
 		O2avg = np.average((Marray-Marrayavg)*(Marray-Marrayavg))
 		O2Eavg = np.average((Earray-Earrayavg)*(Earray-Earrayavg))
 		for t in range(tmax-1):
@@ -1372,21 +1371,26 @@ def CalcAutocorrelation(T):
 		#for i in range(nautotimes):
 			#denom += (Marrayavg
 		
-		for j in range(tmax):
+		for t in range(tmax-1):
 			#M1M2 = 0
 			#E1E2 = 0
 			#for i in range(nautotimes-k):
 				#M1M2 += Marray[i]*Marray[i+k]
 				#E1E2 += Earray[i]*Earray[i+k]
-			Mnume = np.sum((Marray[:tmax-j]-Marrayavg)*(Marray[j:tmax]-Marrayavg))
-			Enume = np.sum((Earray[:tmax-j]-Earrayavg)*(Earray[j:tmax]-Earrayavg))
+			#j = j+1
+			
+			#Vent her... Jeg skal jo passe på jeg ikke bruge samme data points, tror jeg...
+			#
+			Mnume = np.sum((Marray[:tmax-t]-Marrayavg)*(Marray[t:tmax]-Marrayavg))
+			Enume = np.sum((Earray[:tmax-t]-Earrayavg)*(Earray[t:tmax]-Earrayavg))
 			#M1M2 *= 1/(nautotimes-j-1)
 			#E1E2 *= 1/(nautotimes-j-1)
-			Mdenom = np.sum((Marray[:tmax-j]-Marrayavg)**2)
-			Edenom = np.sum((Earray[:tmax-j]-Earrayavg)**2)
+			Mdenom = np.sum((Marray[:tmax-t]-Marrayavg)**2)
+			Edenom = np.sum((Earray[:tmax-t]-Earrayavg)**2)
 			
-			CEts6[j,nt] = Enume/Edenom
-			CMts6[j,nt] = Mnume/Mdenom
+			#j = j-1
+			CEts6[t,nt] = Enume/Edenom
+			CMts6[t,nt] = Mnume/Mdenom
 			
 		#method 7 cs2009.pdf
 		for j in range(tmax):
@@ -1413,9 +1417,85 @@ def CalcAutocorrelation(T):
 				CMts7[j,nt] = Mnume/Mdenom
 			except:
 				print(j)
+				
+		#method 8
+		#CEts8[:,nt] = autocorrelation(Earray)
+		#CMts8[:,nt] = autocorrelation(Marray)
+		
+		#method 9
+		#CEts8[:,nt] = autocorr(Earray,k+1)
+		#CMts8[:,nt] = autocorr(Marray,k+1)
+		
+		#method 10
+		#CEts8[:,nt] = acf(Earray,k+1)
+		#CMts8[:,nt] = acf(Marray,k+1)
+		
+		
+		#method 11
+		#CEts8[:,nt] = acf2(Earray)
+		#CMts8[:,nt] = acf2(Marray)
+		
+		#method 12
+		CEts8[:,nt] = estimated_autocorrelation(Earray)
+		CMts8[:,nt] = estimated_autocorrelation(Marray)
+		
+		
+		#method 12
+		CEts9[:,nt] = autocorr2(Earray)
+		CMts9[:,nt] = autocorr2(Marray)
 		
 	return
+	
+def estimated_autocorrelation(x):
+    """
+    http://stackoverflow.com/q/14297012/190597
+    http://en.wikipedia.org/wiki/Autocorrelation#Estimation
+    """
+    n = len(x)
+    variance = x.var()
+    x = x-x.mean()
+    r = np.correlate(x, x, mode = 'full')[-n:]
+    #assert np.allclose(r, np.array([(x[:n-k]*x[-(n-k):]).sum() for k in range(n)]))
+    result = r/(variance*(np.arange(n, 0, -1)))
+    return result
+	
+# def acf2(series):
+	# """
+	# tror den her vil have pandas series
+	# """
+    # n = len(series)
+    # data = np.asarray(series)
+    # mean = np.mean(data)
+    # c0 = np.sum((data - mean)**2)/n
 
+    # def r(h):
+        # acf_lag = ((data[:n - h] - mean)*(data[h:] - mean)).sum()/n/c0
+        # return round(acf_lag, 3)
+    # x = np.arange(n) # Avoiding lag 0 calculation
+    # acf_coeffs = map(r, x)
+    # return acf_coeffs
+
+def autocorr2(x):
+    result = np.correlate(x, x, mode='full')
+    return result[int(result.size/2):]	
+	
+def autocorr(x, t=1):
+	arrayreturn = np.corrcoef(np.array([x[0:len(x)-t], x[t:len(x)]]))
+	return arrayreturn
+	
+#def acf(x, length=20):
+    #return np.array([1]+[np.corrcoef([x:-i], x[i:])[0,1] for i in range(1, length)])
+
+def autocorrelation(x):
+	"""
+	Compute the autocorrelation of the signal, based on the properties of the
+	power spectral density of the signal.
+	"""
+	xp = x-np.mean(x)
+	f = np.fft.fft(xp)
+	p = np.array([np.real(v)**2+np.imag(v)**2 for v in f])
+	pi = np.fft.ifft(p)
+	return np.real(pi)[:x.size/2]/np.sum(xp**2)
 
 def PlotValues():
 	
@@ -1455,7 +1535,8 @@ def PlotValues():
 def PlotAutocorrelation():
 	fig6 = plt.figure(6)
 	tshere = [j for j in range(tmax)]
-	end = tmax-1
+	#Either use tmax/3 or tmax*0.7
+	end = int(tmax*0.7)
 	plt.axis([0,end,-1.1,1.1])
 	plt.plot(tshere[:end],CMts2[:end,Nt-1], color="red",linestyle="-.")
 	plt.plot(tshere[:end],CEts2[:end,Nt-1], color="black",linestyle="-.")
@@ -1463,18 +1544,25 @@ def PlotAutocorrelation():
 	#plt.plot(tshere[:end],CMts3[:end,Nt-1], color="red",linestyle="-")
 	#plt.plot(tshere[:end],CEts3[:end,Nt-1], color="black",linestyle="-")
 	
-	plt.plot(tshere[:end],CMts4[:end,Nt-1], color="red",linestyle="--")
-	plt.plot(tshere[:end],CEts4[:end,Nt-1], color="black",linestyle="--")
+	#plt.plot(tshere[:end],CMts4[:end,Nt-1], color="black",linestyle="--")
+	#plt.plot(tshere[:end],CEts4[:end,Nt-1], color="black",linestyle="--")
 	
-	plt.plot(tshere[:end],CMts5[:end,Nt-1], color="red",linestyle=":")
-	plt.plot(tshere[:end],CEts5[:end,Nt-1], color="black",linestyle=":")
+	#plt.plot(tshere[:end],CMts5[:end,Nt-1]+0.01, color="blue",linestyle="-")
+	#plt.plot(tshere[:end],CEts5[:end,Nt-1], color="black",linestyle=":")
 	
-	plt.plot(tshere[:end],CMts6[:end,Nt-1], color="green",linestyle=":")
-	plt.plot(tshere[:end],CEts6[:end,Nt-1], color="blue",linestyle=":")
+	#plt.plot(tshere[:end],CMts6[:end,Nt-1], color="green",linestyle=":")
+	#plt.plot(tshere[:end],CEts6[:end,Nt-1], color="blue",linestyle=":")
 	
-	plt.plot(tshere[:end],CMts7[:end,Nt-1], color="green",linestyle="-")
-	plt.plot(tshere[:end],CEts7[:end,Nt-1], color="blue",linestyle="-")
+	#plt.plot(tshere[:end],CMts7[:end,Nt-1], color="yellow",linestyle="-")
+	#plt.plot(tshere[:end],CEts7[:end,Nt-1], color="blue",linestyle="-")
 	
+	#plt.plot(tshere[:end],CMts8[:end,Nt-1], color="purple",linestyle="--")
+	#plt.plot(tshere[:end],CEts8[:end,Nt-1], color="blue",linestyle="-.")
+	
+	#plt.plot(tshere[:end],CMts9[:end,Nt-1], color="black",linestyle=":")
+	#plt.plot(tshere[:end],CEts9[:end,Nt-1], color="blue",linestyle="-.")
+	
+	plt.legend(["M","E"])
 	#plt.legend(["M2","E2","M4","E4"])
 	#plt.legend(["M2","E2","M3","E3","M4","E4"])
 	plt.title("Ising model autocorrelation, T = {}".format(T))
@@ -1562,7 +1650,7 @@ if __name__ == "__main__":
 	Cvs = []
 	Ts = []
 	
-
+	
 	
 	
 	#1 for save, 0 for no savefig
@@ -1599,11 +1687,20 @@ if __name__ == "__main__":
 	CEts7 = np.zeros((tmax,Nt))
 	CMts7 = np.zeros((tmax,Nt))
 	
+	CEts8 = np.zeros((tmax,Nt))
+	CMts8 = np.zeros((tmax,Nt))
+	
+	CEts9 = np.zeros((tmax,Nt))
+	CMts9 = np.zeros((tmax,Nt))
+	
 	T = 3
 	CalcAutocorrelation(T)
 	#print(CEts)
 	PlotAutocorrelation()
-
+	
+	tauint = 0.5 + np.sum(CEts2[:int(tmax*0.7),Nt-1])
+	print(tauint)
+	
 	# fig6 = plt.figure(6)
 	# tshere = [j for j in range(nautotimes)]
 	# end = nautotimes

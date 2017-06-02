@@ -66,7 +66,9 @@ Once the magnetization reaches 0, and the energy reaches it's maximum, we basica
 
 ### Autocorrelation
 To have meaningful average values we need independent and uncorrelated data. Since we change the spin states one site at a time, consecutive states are highly correlated and thus any statistics aswell. Looking at the autocorrelation times we get a sense of how many steps should be between each measurement.
-Two statistics can have different correlation times, so the safer practice is to pick the longest correlation time.
+Two statistics can have different correlation times, so the safer practice is to pick the longest correlation time.  
+For large t values we're calculating a large lag. This also means that the larger lag autocorrelation we calculate, the more error-prone it is, since we'll have fewer points to calculate the autocorrelation from. Hence, first we will see autocorrelation drop off approximately exponentially, but then the lack of 
+measurements will start to create noise in the autocorrelation function, making wild oscillations and peaks etc. So here we cut off the autocorrelation plot at 0.7*tmax, so the noisy tail isn't visible.
 
 ![Autocorrelation.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Autocorrelation.png) 
 
