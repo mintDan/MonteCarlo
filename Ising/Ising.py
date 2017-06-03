@@ -280,7 +280,7 @@ def Esiteflip(S,j,i,nx,ny):
 
 
 
-def MCrunParallel(T,N,J,nx,ny,PreCalcExp,out_list):
+def MCrunParallel(T,Nexperiment,J,nx,ny,PreCalcExp,out_list):
 	"""
 	This can be called with multiprocessing function.
 	But, doing autocorrelation seems to be troublesome...
@@ -400,7 +400,7 @@ def MCrunParallel(T,N,J,nx,ny,PreCalcExp,out_list):
 		#It needs to "remember" at least 2 magnetizations, the current and the last
 		#Can be made more advanced, but that's the simplest
 		#Samples at N,2N,3N,4N... monte carlo steps
-		if n%N == 0:
+		if n%Nexperiment == 0:
 			#We only measure M during full Monte Carlo Sweeps, every N steps iirc
 			
 			Sweeps += 1
@@ -615,11 +615,11 @@ def MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts):
 		#mt0mt = 0
 		
 		
-		Marray = np.zeros(nautotimes)
-		M2array = np.zeros(nautotimes)
+		Marray = np.zeros(tmax)
+		M2array = np.zeros(tmax)
 		
-		Earray = np.zeros(nautotimes)
-		E2array = np.zeros(nautotimes)
+		Earray = np.zeros(tmax)
+		E2array = np.zeros(tmax)
 		
 		#==================================================================
 		#Fordi noget med at bad initial conditions kan give local minim..
@@ -678,7 +678,7 @@ def MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts):
 			#out_list = []
 			
 			process = multiprocessing.Process(target=MCrunParallel, 
-											args=(T,N,J,nx,ny,PreCalcExp,out_list))
+											args=(T,Nexperiment,J,nx,ny,PreCalcExp,out_list))
 			jobs.append(process)
 											
 		for j in jobs:
@@ -983,60 +983,6 @@ def MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts):
 		T += dT
 
 		
-		#==========================================
-		#What data do other get?
-		#2-dimensional_ising_model
-		#XT i ranges 0-100
-		#Cv i range 0-0.6
-		#ENergy pr link 0-(-1)
-		
-		#advancedlab1_Part1
-		#E per site 0-(-2)
-		#Cv specific 0-0.12
-		#X 0-0.3
-		#Nok kun E som er pr site?
-		
-		
-		#AsherIsingModelReport
-		#E pr site 0-(-2)
-		#X 0-0.4
-		#Cv 0-0.2
-		
-		
-		#Chap12_Ising_Model_v04
-		#E pr site 0-(-2)
-		#Cv/N 0-4
-		
-		
-		#Ising (1)
-		#C/N 0-3
-		#E/N 0-(-2)
-		
-		
-		#Ising Model 1
-		#E 0-(-1)
-		#Cv 0-10
-		#XT 0-300
-		
-		
-		#ising_Model
-		#E pr spin 0-(-4)
-		#Cv 0-5000
-		#XT pr spin 0-0.18
-		
-		
-		#lecture6-stat_mech
-		#Cv pr spin 0-2
-		#
-		
-		#SCALAS2013_04_16-17
-		#Cv 0-1.5
-		
-		#Student Ising Swarthmore
-		#E fra 0-(-2)
-		#Cv 0-0.2
-		#X 0-0.1
-		
 def CalcAutocorrelation(T):
 	"""
 	Makes autocorrelation, different temperatures, different observables
@@ -1158,10 +1104,6 @@ def CalcAutocorrelation(T):
 
 			n += 1
 
-				
-			
-
-	
 		#=================================================================
 		#print some stuff to see progress
 		print("T = {0:.3f}".format(T))
@@ -1283,219 +1225,10 @@ def CalcAutocorrelation(T):
 			CEts2[k,nt] = Enume/Edenom
 			CMts2[k,nt] = Mnume/Mdenom
 		
-		#method 3 mc_notes2.pdf
-		#Jeg skal bruge C(t) -> 1/nautotimes-t * sum Q_t0Q_to+t
-		#M1M2 = 0
-		#E1E2 = 0
-		for t in range(tmax-1):
-			M1M2 = 0
-			E1E2 = 0
-			for i in range(tmax-t-1):
-				M1M2 += Marray[i]*Marray[i+t+1]
-				E1E2 += Earray[i]*Earray[i+t+1]
-			faktor = 1/(tmax-t-1)
-			M1M2 *= faktor
-			E1E2 *= faktor
-			CEts3[t,nt] = (E1E2-Earrayavg*Earrayavg)/EX0
-			CMts3[t,nt] = (M1M2-Marrayavg*Marrayavg)/MX0
-		
-		#Method 4
-		#Ved ikke helt om den skal gå fra til tmax elelr tmax-1, men jeg tror tmax?
-		#Jeg tror ikke den KAN gå helt op til tmax???
-		#Forid så får man division by 0 in faktor
-		#Kan sgu være jeg bør se lidt på de her faktor og indices
-		#Eller, det kan de jo faktisk heller ikke i math equation der står jo også 1/(tmax-t).. hvis t=tmax så får man division by 0!
-		for k in range(tmax-1):
-			#MWeirdsum = 0
-			#MWeirdsum2 = 0
-			#MWeirdsum3 = 0
-			
-			#EWeirdsum = 0
-			#EWeirdsum2 = 0
-			#EWeirdsum3 = 0
-			
-			#Vectorized sums
-			MWeirdsum = np.sum(Marray[:tmax-k]*Marray[k:tmax])
-			MWeirdsum2 = np.sum(Marray[:tmax-k])
-			MWeirdsum3 = np.sum(Marray[k:tmax])
-			
-			EWeirdsum = np.sum(Earray[:tmax-k]*Earray[k:tmax])
-			EWeirdsum2 = np.sum(Earray[:tmax-k])
-			EWeirdsum3 = np.sum(Earray[k:tmax])
-			
-			#for i in range(nautotimes-j):
-			#	MWeirdsum += Marray[i]*Marray[i+j]
-			#	MWeirdsum2 += Marray[i]
-			#	MWeirdsum3 += Marray[i+j]
-				
-			#	EWeirdsum += Earray[i]*Earray[i+j]
-			#	EWeirdsum2 += Earray[i]
-			#	EWeirdsum3 += Earray[i+j]
-			#	
-			faktor = (1.0/(tmax-k-1))
-			MWeirdsum *= faktor
-			MWeirdsum2 *= faktor
-			MWeirdsum3 *= faktor
-			
-			EWeirdsum *= faktor
-			EWeirdsum2 *= faktor
-			EWeirdsum3 *= faktor
-			#C300Method4 = (Weirdsum - Weirdsum2*Weirdsum3)/X0
-			CMts4[k,nt] = (MWeirdsum - MWeirdsum2*MWeirdsum3)/MX0
-			CEts4[k,nt] = (EWeirdsum - EWeirdsum2*EWeirdsum3)/EX0
-			
-		#print(C300Method4)
-		
-		#method 5 cluster.pdf
-		O2avg = np.average((Marray-Marrayavg)*(Marray-Marrayavg))
-		O2Eavg = np.average((Earray-Earrayavg)*(Earray-Earrayavg))
-		for t in range(tmax-1):
-			Oi = Marray[:tmax-t]-Marrayavg
-			Oit = Marray[t:tmax]-Marrayavg
-			OiOit = np.sum(Oi*Oit)
-			
-			OiE = Earray[:tmax-t]-Earrayavg
-			OitE = Earray[t:tmax]-Earrayavg
-			OiEOitE = np.sum(OiE*OitE)
-			
-			faktor = 1/(tmax-t-1)
-			OiOit *= faktor
-			OiEOitE *= faktor
-			
-			CMts5[t,nt] = OiOit/O2avg
-			CEts5[t,nt] = OiEOitE/O2Eavg
-		
-		
-		#method 6 cs2009.pdf
-		
-		#for i in range(nautotimes):
-			#denom += (Marrayavg
-		
-		for t in range(tmax-1):
-			#M1M2 = 0
-			#E1E2 = 0
-			#for i in range(nautotimes-k):
-				#M1M2 += Marray[i]*Marray[i+k]
-				#E1E2 += Earray[i]*Earray[i+k]
-			#j = j+1
-			
-			#Vent her... Jeg skal jo passe på jeg ikke bruge samme data points, tror jeg...
-			#
-			Mnume = np.sum((Marray[:tmax-t]-Marrayavg)*(Marray[t:tmax]-Marrayavg))
-			Enume = np.sum((Earray[:tmax-t]-Earrayavg)*(Earray[t:tmax]-Earrayavg))
-			#M1M2 *= 1/(nautotimes-j-1)
-			#E1E2 *= 1/(nautotimes-j-1)
-			Mdenom = np.sum((Marray[:tmax-t]-Marrayavg)**2)
-			Edenom = np.sum((Earray[:tmax-t]-Earrayavg)**2)
-			
-			#j = j-1
-			CEts6[t,nt] = Enume/Edenom
-			CMts6[t,nt] = Mnume/Mdenom
-			
-		#method 7 cs2009.pdf
-		for j in range(tmax):
-			#M1M2 = 0
-			#E1E2 = 0
-			#for i in range(nautotimes-k):
-				#M1M2 += Marray[i]*Marray[i+k]
-				#E1E2 += Earray[i]*Earray[i+k]
-			Marrayavg = np.average(Marray[:tmax-j])
-			Earrayavg = np.average(Earray[:tmax-j])
-			
-			Mtarrayavg = np.average(Marray[j:tmax])
-			Etarrayavg = np.average(Earray[j:tmax])
-			
-			Mnume = np.sum((Marray[:tmax-j]-Marrayavg)*(Marray[j:tmax]-Mtarrayavg))
-			Enume = np.sum((Earray[:tmax-j]-Earrayavg)*(Earray[j:tmax]-Etarrayavg))
-			#M1M2 *= 1/(nautotimes-j-1)
-			#E1E2 *= 1/(nautotimes-j-1)
-			try:
-				Mdenom = np.sqrt(np.sum((Marray[:tmax-j]-Marrayavg)**2)*np.sum((Marray[j:tmax]-Mtarrayavg)**2))
-				Edenom = np.sqrt(np.sum((Earray[:tmax-j]-Earrayavg)**2)*np.sum((Earray[j:tmax]-Etarrayavg)**2))
-				
-				CEts7[j,nt] = Enume/Edenom
-				CMts7[j,nt] = Mnume/Mdenom
-			except:
-				print(j)
-				
-		#method 8
-		#CEts8[:,nt] = autocorrelation(Earray)
-		#CMts8[:,nt] = autocorrelation(Marray)
-		
-		#method 9
-		#CEts8[:,nt] = autocorr(Earray,k+1)
-		#CMts8[:,nt] = autocorr(Marray,k+1)
-		
-		#method 10
-		#CEts8[:,nt] = acf(Earray,k+1)
-		#CMts8[:,nt] = acf(Marray,k+1)
-		
-		
-		#method 11
-		#CEts8[:,nt] = acf2(Earray)
-		#CMts8[:,nt] = acf2(Marray)
-		
-		#method 12
-		CEts8[:,nt] = estimated_autocorrelation(Earray)
-		CMts8[:,nt] = estimated_autocorrelation(Marray)
-		
-		
-		#method 12
-		CEts9[:,nt] = autocorr2(Earray)
-		CMts9[:,nt] = autocorr2(Marray)
+
 		
 	return
-	
-def estimated_autocorrelation(x):
-    """
-    http://stackoverflow.com/q/14297012/190597
-    http://en.wikipedia.org/wiki/Autocorrelation#Estimation
-    """
-    n = len(x)
-    variance = x.var()
-    x = x-x.mean()
-    r = np.correlate(x, x, mode = 'full')[-n:]
-    #assert np.allclose(r, np.array([(x[:n-k]*x[-(n-k):]).sum() for k in range(n)]))
-    result = r/(variance*(np.arange(n, 0, -1)))
-    return result
-	
-# def acf2(series):
-	# """
-	# tror den her vil have pandas series
-	# """
-    # n = len(series)
-    # data = np.asarray(series)
-    # mean = np.mean(data)
-    # c0 = np.sum((data - mean)**2)/n
 
-    # def r(h):
-        # acf_lag = ((data[:n - h] - mean)*(data[h:] - mean)).sum()/n/c0
-        # return round(acf_lag, 3)
-    # x = np.arange(n) # Avoiding lag 0 calculation
-    # acf_coeffs = map(r, x)
-    # return acf_coeffs
-
-def autocorr2(x):
-    result = np.correlate(x, x, mode='full')
-    return result[int(result.size/2):]	
-	
-def autocorr(x, t=1):
-	arrayreturn = np.corrcoef(np.array([x[0:len(x)-t], x[t:len(x)]]))
-	return arrayreturn
-	
-#def acf(x, length=20):
-    #return np.array([1]+[np.corrcoef([x:-i], x[i:])[0,1] for i in range(1, length)])
-
-def autocorrelation(x):
-	"""
-	Compute the autocorrelation of the signal, based on the properties of the
-	power spectral density of the signal.
-	"""
-	xp = x-np.mean(x)
-	f = np.fft.fft(xp)
-	p = np.array([np.real(v)**2+np.imag(v)**2 for v in f])
-	pi = np.fft.ifft(p)
-	return np.real(pi)[:x.size/2]/np.sum(xp**2)
 
 def PlotValues():
 	
@@ -1541,26 +1274,7 @@ def PlotAutocorrelation():
 	plt.plot(tshere[:end],CMts2[:end,Nt-1], color="red",linestyle="-.")
 	plt.plot(tshere[:end],CEts2[:end,Nt-1], color="black",linestyle="-.")
 	
-	#plt.plot(tshere[:end],CMts3[:end,Nt-1], color="red",linestyle="-")
-	#plt.plot(tshere[:end],CEts3[:end,Nt-1], color="black",linestyle="-")
-	
-	#plt.plot(tshere[:end],CMts4[:end,Nt-1], color="black",linestyle="--")
-	#plt.plot(tshere[:end],CEts4[:end,Nt-1], color="black",linestyle="--")
-	
-	#plt.plot(tshere[:end],CMts5[:end,Nt-1]+0.01, color="blue",linestyle="-")
-	#plt.plot(tshere[:end],CEts5[:end,Nt-1], color="black",linestyle=":")
-	
-	#plt.plot(tshere[:end],CMts6[:end,Nt-1], color="green",linestyle=":")
-	#plt.plot(tshere[:end],CEts6[:end,Nt-1], color="blue",linestyle=":")
-	
-	#plt.plot(tshere[:end],CMts7[:end,Nt-1], color="yellow",linestyle="-")
-	#plt.plot(tshere[:end],CEts7[:end,Nt-1], color="blue",linestyle="-")
-	
-	#plt.plot(tshere[:end],CMts8[:end,Nt-1], color="purple",linestyle="--")
-	#plt.plot(tshere[:end],CEts8[:end,Nt-1], color="blue",linestyle="-.")
-	
-	#plt.plot(tshere[:end],CMts9[:end,Nt-1], color="black",linestyle=":")
-	#plt.plot(tshere[:end],CEts9[:end,Nt-1], color="blue",linestyle="-.")
+
 	
 	plt.legend(["M","E"])
 	#plt.legend(["M2","E2","M4","E4"])
@@ -1650,14 +1364,6 @@ if __name__ == "__main__":
 	Cvs = []
 	Ts = []
 	
-	
-	
-	
-	#1 for save, 0 for no savefig
-	SaveFig = 0
-	
-	#MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts)
-	
 	#======================================================
 	#Make Autocorrelations
 	#Should perhaps fit to data also, maybe? so i get the actual time thing.
@@ -1671,50 +1377,41 @@ if __name__ == "__main__":
 	#Autocorrelation
 	CEts2 = np.zeros((tmax,Nt))
 	CMts2 = np.zeros((tmax,Nt))
-	
-	CEts3 = np.zeros((tmax,Nt))
-	CMts3 = np.zeros((tmax,Nt))
-	
-	CEts4 = np.zeros((tmax,Nt))
-	CMts4 = np.zeros((tmax,Nt))
-	
-	CEts5 = np.zeros((tmax,Nt))
-	CMts5 = np.zeros((tmax,Nt))
-	
-	CEts6 = np.zeros((tmax,Nt))
-	CMts6 = np.zeros((tmax,Nt))
-	
-	CEts7 = np.zeros((tmax,Nt))
-	CMts7 = np.zeros((tmax,Nt))
-	
-	CEts8 = np.zeros((tmax,Nt))
-	CMts8 = np.zeros((tmax,Nt))
-	
-	CEts9 = np.zeros((tmax,Nt))
-	CMts9 = np.zeros((tmax,Nt))
-	
+
 	T = 3
 	CalcAutocorrelation(T)
 	#print(CEts)
 	PlotAutocorrelation()
 	
-	tauint = 0.5 + np.sum(CEts2[:int(tmax*0.7),Nt-1])
+	tauint1 = int(0.5 + np.sum(CEts2[:int(tmax*0.7),Nt-1]))
+	tauint2 = int(0.5 + np.sum(CMts2[:int(tmax*0.7),Nt-1]))
+	tauint = max(tauint1,tauint2)
 	print(tauint)
 	
-	# fig6 = plt.figure(6)
-	# tshere = [j for j in range(nautotimes)]
-	# end = nautotimes
-	# plt.plot(tshere[:end],CMts3[:end,0], color="red",linestyle="-")
-	# plt.plot(tshere[:end],CEts3[:end,0], color="black",linestyle="-")
+	#=====================================================
+	#Main script, parallelized
 	
-	# plt.plot(tshere[:end],CMts4[:end,Nt-1], color="blue",linestyle="--")
-	# plt.plot(tshere[:end],CEts4[:end,Nt-1], color="black",linestyle="--")
-	# plt.legend(["M","E"])
-	# plt.title("Ising model autocorrelation , T = {}".format(T))
-	# plt.xlabel("n timestep")
-	# plt.ylabel("C(n)")
-	# fig6.savefig('Autocorrelation.png', bbox_inches='tight')
-	# plt.show()
+	
+	T = 0.9
+	dT = 0.1
+	Nt = 40
+	J = 1# J > 0 gives ferromagnetism
+	ntest = 16 #Amount of Monte Carlo runs we do for EACH temperature. To weed out local minimum effects
+	
+	tmax = 4000
+	
+	if tauint > N:
+		Nexperiment = tauint
+	else:
+		Nexperiment = N
+	
+	#1 for save, 0 for no savefig
+	SaveFig = 0
+	
+	MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts2,CMts2)
+	
+
+	
 	#=====================================================
 	#Make plots
 	#PlotValues()

@@ -69,6 +69,7 @@ To have meaningful average values we need independent and uncorrelated data. Sin
 Two statistics can have different correlation times, so the safer practice is to pick the longest correlation time.  
 For large t values we're calculating a large lag. This also means that the larger lag autocorrelation we calculate, the more error-prone it is, since we'll have fewer points to calculate the autocorrelation from. Hence, first we will see autocorrelation drop off approximately exponentially, but then the lack of 
 measurements will start to create noise in the autocorrelation function, making wild oscillations and peaks etc. So here we cut off the autocorrelation plot at 0.7*tmax, so the noisy tail isn't visible.
+Integrating the autocorrelation values gives the integrated autocorrelation time. In a sense it's a more direct way to get the parameter for exponential decay compared to fitting and doing least squares etc.  The integrated autocorrelation time calculated is then used in collecting data to avoid correlated data.
 
 ![Autocorrelation.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Autocorrelation.png) 
 
