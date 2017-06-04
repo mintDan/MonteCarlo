@@ -705,229 +705,7 @@ def MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts):
 			E2avg += results[i][2]
 			Eavg += results[i][3]
 
-		
-		
-		
-		
-		# for navg in range(ntest):
 			
-			# #==================================================================
-			# #Think i should seed each run? WIthout any input it will use current time to seed.
-			# np.random.seed()
-			
-			# #==================================================================
-			# #Here I make the initial spin state. If T < Tcritical, i make fully aligned state of ones, else i make a random state of {-1,1}
-			
-			# #randomS(S)
-			# if T < 2.2:
-				# S = np.ones((ny,nx))
-
-		
-			# else:
-				# #If val of index = 0, then we go to -1, if val of index = 2, then we get 1.
-				# S = 2*np.random.randint(0,2,(ny,nx))-1
-				
-				
-			# #print(S)
-			
-			# #Lige her bør jeg faktisk lave en endnu en loop
-			
-			# #Der bør være en Meqold = 0 og 1, 0 for T > Tcrit, det er mere efficient, så vi tager Meqold som givet ud fra initial state her
-			# #Det er mere flexible
-			# #Meqold = 1
-			# Meqold = np.abs(np.sum(S))
-			# if Meqold == 0:
-				# #Jeg må ikke have division by 0 error
-				# Meqold = 0.1
-			
-			
-			# MEquilibriumCount = 0
-			# #100*N = 100*625 = 62500
-			# #E2calcavg = 0
-			
-
-			
-			
-			# #I need to make an average of M*M for <M**2>
-			# #And later, I need to make an average of THESE aswell, with 1/ntest faktor
-			# #So it will be double average for <M**2>, and probably should do the same for <E**2>?
-			# Avgcount = 0
-			
-			# MavgMC = 0
-			# M2avgMC = 0
-			# EavgMC = 0
-			# E2avgMC = 0
-			
-			# #================================================
-			# #This is the actual MonteCarlo loop, changing the configuration based on probabilities
-			# #This should perhaps be a while loop instead... while Avgcount < 10
-			# n = 0
-			# while Avgcount < 10:
-			# #for n in range(150*N):
-				# randi = np.random.randint(0,nx)
-				# randj = np.random.randint(0,nx)
-
-
-				# dE = Esiteflip(S,randj,randi)
-			
-				# if dE < 0:
-					# S[randj,randi] *= -1
-				# else:
-					# x = np.random.uniform(0,1)
-					
-					# #P = np.exp(-dE/T) #PreCalcExp[dH-8]# #Cant use precalculated that well, since we are increasing T
-					# #P = PreCalcExp[int(dE)+8]
-					# P = PreCalcExp[int((dE+8)/2)]
-					# #Hvis dH=0, så tager vi PreCalcExp[8]
-					# #P = np.exp(-dH/T)
-					# if x <= P:
-						# S[randj,randi] *= -1
-						
-				# #=========================================================
-				# #Values for autocorrelation
-				# #if nt == Nt-1:
-					# #Do autocorrelation
-					# #I need values at t0, let's do it for magnetization made
-					# #let's say it's at timestep 200 i call it t0
-					# #So, the time is an n index and obviously has to be somewhere in the MONTECARLO LOOP.
-					# #So, i actually do make a counter for n in the monte carlo loop, so
-				# #if n == 200:
-				# #	mt0current = np.abs(np.sum(S))
-					
-				# #	mt0 += mt0current
-				# #	m2t0 += mt0current*mt0current
-				
-				# #if n == 300:
-				# #	mtcurrent = np.abs(np.sum(S))
-				# #	mt += mtcurrent
-					
-				# #	mt0mt += mt0current*mtcurrent
-					
-				
-				# #Method 2
-				# if nt == Nt-1:
-					# if navg == ntest-1:
-						# if n <= nautotimes-1:
-							# Mauto = np.abs(np.sum(S))
-							# Marray[n] = Mauto
-							# M2array[n] = Mauto*Mauto
-							
-							# Eauto = CalcH(S)
-							# Earray[n] = Eauto
-							# E2array[n] = Eauto*Eauto
-						
-					
-				
-				
-				# #=========================================================
-				# #Here I count succesive equilibrium states,
-				# #It needs to "remember" at least 2 magnetizations, the current and the last
-				# #Can be made more advanced, but that's the simplest
-				# #Samples at N,2N,3N,4N... monte carlo steps
-				# if n%N == 0:
-				
-					# #We only measure M during full Monte Carlo Sweeps, every N steps iirc
-					
-					# Meq = np.abs(np.sum(S))
-					# if Meqold != 0:
-						
-						# #Tror denne her skal ændres tbh? Hvis jeg vil sammenligne to ting, så er det (a-b)/b tror jeg?
-						# #if np.abs(Meq/(Meqbefore)) < 5:
-						# if np.abs((Meq-Meqold)/Meqold) < 0.99:
-						# #The last state is within 5% of the current, so we have an Equilibrium count
-							# MEquilibriumCount += 1
-							
-						# #Reset equilibrium counter
-						# #Hvis vi har fx count == 2, men så kommer der en huge spike, så skal count gå tilbage til 0...
-						# else:
-							# MEquilibriumCount = 0
-					
-					# if MEquilibriumCount >= 10:
-						# #We have reached equilibrium let's say, since the last 10 equilibriums are within 5%
-						# #On the hand, having many equilibrium counts is good, on the other, sometimes by chance, a state will hit a spike,
-						# #even after hitting equilibrium. so if we demand 100 equilibrium counts in a row, there is a good chance that at SOME POINT
-						# #during those 100 counts, a subsequent state would have slightly too different, and we would have to start all over with 100 counts.
-						# #So 10 seems enough.
-						
-						# #For equilibrium counts above 10, we calculate average M2
-						# MavgMC += Meq
-						# M2avgMC += Meq*Meq
-						
-						# Ecalc = CalcH(S)
-						# EavgMC += Ecalc
-						# E2avgMC += Ecalc*Ecalc
-						
-						
-						# #Avgcount used for E and M
-						# Avgcount += 1
-						
-					
-					# if MEquilibriumCount == 20:
-					
-						# #So we have done 10x measurements for M2, E2 etc, and now we're ready to exit this state
-						# break
-						
-					# else:
-						# Meqold = Meq
-
-				# n += 1
-			# if navg == ntest-1:
-				# print(n)	
-				
-			# #The first, inner average of M**2
-			# #This is the average of samples from the same MC run. We get 10 samples from each MC run, after the configuration has reached equilibrium
-			# MavgMC *= (1/Avgcount)
-			# M2avgMC *= (1/Avgcount)
-			# E2avgMC *= (1/Avgcount)
-			# EavgMC *= (1/Avgcount)
-					
-					
-					
-			# #E2calcavg *= (1.0/20.0)
-
-			# #MavgMC, M2avgMC, E2avgMC, EavgMC = MCrunParallel(T,nx,ny,PreCalcExp)
-			# #==================================================================
-			# #What happens here?
-			# #Calculate Energies, jeg venter med at divide med N til sidst, pga E2avg
-			# #Etotal = CalcH(S)
-			
-			# #Eavg += Etotal
-			
-			# #Calculate Eavg from equilibration samples
-			# Eavg += EavgMC
-			
-			
-			# #E2avg += Etotal*Etotal
-			
-			# #Calculate E2avg with the already averaged E2avgMC, to get <E**2>
-			# E2avg += E2avgMC
-			
-			
-			# #Calculate Magnetization
-			# #I want it to be absolute value, and an average, pr site, i think.
-			# #I want to to be absolute especially if I'm gonna run the test multiple times and average it.
-			
-			# #Mtotal = np.abs(np.sum(S))
-			
-			# #Mavg += Mtotal
-			
-			# Mavg += MavgMC
-			
-			# #Used for isothermal susceptibility, skal måske her divide med N**2?
-			# #Skal måske også lave den til M*M ligesom Etotal*Etotal...
-			# #I (<M2>-<M>**2) så vil <M>**2 have faktor 1/N**2, mens <M2> kun har faktor 1/N
-			# #Så det skal nok være faktor 1/N**2 også på M2
-			
-			# #M2avg += Mtotal*Mtotal
-			
-			# #Calculate M2avg with the already averaged M2avgMC, to REALLY get a <M**2>
-			
-			# M2avg += M2avgMC
-			
-			# #M2avg = M2avg + np.abs(np.sum(S**2))
-		
-		
-		
 		#================================================
 		#The energy E and magnetizaion M, etc, for this GIVEN temperature T is calculated.
 		#We have done e.g ntest = 10 MC runs at the same temperature,
@@ -1043,7 +821,12 @@ def CalcAutocorrelation(T):
 			#If val of index = 0, then we go to -1, if val of index = 2, then we get 1.
 			S = 2*np.random.randint(0,2,(ny,nx))-1
 
-
+		#================================================
+		#Calculate beginning energy.
+		#Instead of calculating energy each iteration which is O(N^2) i will just do E0+= dE
+		EACF = CalcH(S,nx,ny,J)
+		
+		
 		#================================================
 		#This is the actual MonteCarlo loop, changing the configuration based on probabilities
 		#This should perhaps be a while loop instead... while Avgcount < 10
@@ -1058,6 +841,7 @@ def CalcAutocorrelation(T):
 		
 			if dE < 0:
 				S[randj,randi] *= -1
+				EACF += dE
 			else:
 				x = np.random.uniform(0,1)
 				
@@ -1068,6 +852,7 @@ def CalcAutocorrelation(T):
 				#P = np.exp(-dH/T)
 				if x <= P:
 					S[randj,randi] *= -1
+					EACF += dE
 					
 			#=========================================================
 			#Values for autocorrelation
@@ -1098,7 +883,7 @@ def CalcAutocorrelation(T):
 			Marray[n] = Mauto
 			M2array[n] = Mauto*Mauto
 			
-			Eauto = CalcH(S,nx,ny,J)
+			Eauto = EACF#CalcH(S,nx,ny,J)
 			Earray[n] = Eauto
 			E2array[n] = Eauto*Eauto
 
@@ -1111,77 +896,8 @@ def CalcAutocorrelation(T):
 		
 		#============================
 		#Increment T
-		T+= dT
+		T += dT
 		
-		
-		#mt0 = 0
-		#m2t0 = 0
-		#mt = 0
-		#mt0mt = 0
-		
-		#==========================================
-		#Let's try do see some Autocorrelation, first for last timestep
-		#for ntest in range(Ntest):
-		#	for nmc in range(BigNmc):
-		#		if nt == Nt-1:
-					#Do autocorrelation
-					#I need values at t0, let's do it for magnetization made
-					#let's say it's at timestep 200 i call it t0
-					#So, the time is an n index and obviously has to be somewhere in the MONTECARLO LOOP.
-					#So, i actually do make a counter for n in the monte carlo loop, so
-		#			if n == 200:
-		#				mt0current = np.abs(np.sum(S))
-		#				
-		#				mt0 += mt0current
-		#				m2t0 += mt0current*mt0current
-					
-		#			if n == 300:
-		#				mtcurrent = np.abs(np.sum(S))
-		#				mt += mtcurrent
-						
-		#				mt0mt += mt0current*mtcurrent
-					
-		#mt0avg = mt0/ntest
-		#m2t0avg = m2t0/ntest
-		#mtavg = mt/ntest
-		
-		#mt0mtavg = mt0mt/ntest
-		
-		#Cmt = (mt0mtavg-mt0avg*mtavg)/(m2t0avg-mt0avg*mt0avg)
-		#print(Cmt)
-		
-		
-		#Cmt2 = (mt0mtavg-mt0avg*mt0avg)/(m2t0avg-mt0avg*mt0avg)
-		#print(Cmt, Cmt2)
-		
-		
-		
-		#Method 2
-		
-		#Marrayavg = np.average(Marray)
-		#M2arrayavg = np.average(M2array)
-		#Weirdsum = 0
-		#for i in range(700):
-		#	Weirdsum += Marray[i]*Marray[i+300]
-		#Weirdsum *= (1.0/(700))
-		
-		#C300Method2 = (Weirdsum - Marrayavg*Marrayavg)/(M2arrayavg-Marrayavg*Marrayavg)
-		#print(C300)
-		
-		
-		#method 3
-		#Weirdsum2 = 0
-		#Weirdsum3 = 0
-		#for i in range(700):
-		#	Weirdsum2 += Marray[i]
-		#	Weirdsum3 += Marray[i+300]
-		#Weirdsum2 *= (1.0/(700))
-		#Weirdsum3 *= (1.0/(700))
-
-		#C300Method3 = Weirdsum - Weirdsum2*Weirdsum3
-		#print(C300Method2,C300Method3)
-		
-		#Method 4
 		
 		#=====================================
 		#De her ting TROR jeg skal bruges til alle metoderne, så dem laver vi bare
@@ -1265,7 +981,26 @@ def PlotValues():
 	fig5.savefig('Specificheat.png', bbox_inches='tight')
 	plt.show()
 
-def PlotAutocorrelation():
+def PlotACFTemp():
+	fig7 = plt.figure(6)
+
+
+	plt.plot(Tauto,tauMarray, color="red",linestyle="-.")
+	plt.plot(Tauto,tauEarray, color="black",linestyle="-.")
+	
+
+	
+	plt.legend(["M","E"])
+	#plt.legend(["M2","E2","M4","E4"])
+	#plt.legend(["M2","E2","M3","E3","M4","E4"])
+	plt.title("Ising model autocorrelation time")
+	plt.xlabel("T temperature")
+	plt.ylabel("t (timesteps n)")
+	fig7.savefig('AutocorrelationTime.png', bbox_inches='tight')
+	plt.show()
+	
+	
+def PlotACFTime():
 	fig6 = plt.figure(6)
 	tshere = [j for j in range(tmax)]
 	#Either use tmax/3 or tmax*0.7
@@ -1284,7 +1019,6 @@ def PlotAutocorrelation():
 	plt.ylabel("C(n)")
 	fig6.savefig('Autocorrelation.png', bbox_inches='tight')
 	plt.show()
-	
 
 def animate(i): #i increment with 1 each step
 
@@ -1370,23 +1104,37 @@ if __name__ == "__main__":
 	
 	#For autocorrelation, we don't take 10 tests i think, at least in the most simple case
 	#so, ntest = 1 we put it.
-	ntest = 1
-	Nt = 1
+	#Nt = 20
 	kt = 6
 	tmax = int(kt*1000)
 	#Autocorrelation
 	CEts2 = np.zeros((tmax,Nt))
 	CMts2 = np.zeros((tmax,Nt))
 
-	T = 3
+	#T = 1
+	#dT = 0.15
+	Tauto = np.linspace(T,T+Nt*dT,Nt)
 	CalcAutocorrelation(T)
 	#print(CEts)
-	PlotAutocorrelation()
+	
+	
+	tauEarray = np.zeros(Nt)
+	tauMarray = np.zeros(Nt)
+	for i in range(Nt):
+		tauEarray[i] = int(0.5 + np.sum(CEts2[:int(tmax*0.7),i]))
+		tauMarray[i] = int(0.5 + np.sum(CMts2[:int(tmax*0.7),i]))
 	
 	tauint1 = int(0.5 + np.sum(CEts2[:int(tmax*0.7),Nt-1]))
 	tauint2 = int(0.5 + np.sum(CMts2[:int(tmax*0.7),Nt-1]))
 	tauint = max(tauint1,tauint2)
 	print(tauint)
+	
+	#====================================================
+	#Plot autocorrelation and time
+	
+	PlotACFTemp()
+	PlotACFTime()
+	
 	
 	#=====================================================
 	#Main script, parallelized
