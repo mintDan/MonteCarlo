@@ -10,11 +10,12 @@ def TimeCode(f):
 	Decorator to time code
 	"""
 	def timed(*args, **kw):
+		print("Starting "+f.__name__)
 		ts = time.time()
 		result = f(*args, **kw)
 		te = time.time()
-		print("Time difference based on decorator")
-		print(f.__name__)
+		print("Time difference in seconds based on decorator for "+f.__name__)
+		#print(f.__name__)
 		print(te-ts)
 		
 		return result #Den return result fra RunMonteCarlo()
@@ -756,11 +757,11 @@ def MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts,CMts):
 		Ms.append(M)
 		Es.append(E)
 		XTs.append(XT)
-		Ts.append(T)
+		#Ts.append(T)
 		Cvs.append(Cv)
 		T += dT
 
-		
+@TimeCode
 def CalcAutocorrelation(T):
 	"""
 	Makes autocorrelation, different temperatures, different observables
@@ -953,7 +954,7 @@ def PlotValues():
 	plt.xlabel("T")
 	plt.ylabel("m")
 	plt.title("Magnetization")
-	fig2.savefig('Magnetization.png', bbox_inches='tight')
+	fig2.savefig('figs/Magnetization.png', bbox_inches='tight')
 	plt.show()
 
 	fig3 = plt.figure(3)
@@ -969,7 +970,7 @@ def PlotValues():
 	plt.xlabel("T")
 	plt.ylabel("XT")
 	plt.title("Isothermal Susceptibility")
-	fig4.savefig('Susceptibility', bbox_inches='tight')
+	fig4.savefig('figs/Susceptibility', bbox_inches='tight')
 	plt.show()
 
 
@@ -978,7 +979,7 @@ def PlotValues():
 	plt.xlabel("T")
 	plt.ylabel("Cv")
 	plt.title("Specific heat")
-	fig5.savefig('Specificheat.png', bbox_inches='tight')
+	fig5.savefig('figs/Specificheat.png', bbox_inches='tight')
 	plt.show()
 
 def PlotACFTemp():
@@ -996,7 +997,7 @@ def PlotACFTemp():
 	plt.title("Ising model autocorrelation time")
 	plt.xlabel("T temperature")
 	plt.ylabel("t (timesteps n)")
-	fig7.savefig('AutocorrelationTime.png', bbox_inches='tight')
+	fig7.savefig('figs/AutocorrelationTemp.png', bbox_inches='tight')
 	plt.show()
 	
 	
@@ -1006,19 +1007,41 @@ def PlotACFTime():
 	#Either use tmax/3 or tmax*0.7
 	end = int(tmax*0.7)
 	plt.axis([0,end,-1.1,1.1])
-	plt.plot(tshere[:end],CMts2[:end,Nt-1], color="red",linestyle="-.")
-	plt.plot(tshere[:end],CEts2[:end,Nt-1], color="black",linestyle="-.")
+	plt.plot(tshere[:end],CMts2[:end,30], color="red",linestyle="-.")
+	plt.plot(tshere[:end],CEts2[:end,30], color="black",linestyle="-.")
 	
 
 	
 	plt.legend(["M","E"])
 	#plt.legend(["M2","E2","M4","E4"])
 	#plt.legend(["M2","E2","M3","E3","M4","E4"])
-	plt.title("Ising model autocorrelation, T = {}".format(T))
+	plt.title("Ising model autocorrelation, T = {}".format(Ts[30]))
 	plt.xlabel("n timestep")
 	plt.ylabel("C(n)")
-	fig6.savefig('Autocorrelation.png', bbox_inches='tight')
-	plt.show()
+	fig6.savefig('figs/Autocorrelation.png', bbox_inches='tight')
+	#plt.show()
+
+	plt.clf()	
+	for i in range(Nt):
+		fig6 = plt.figure(6)
+		
+		#Either use tmax/3 or tmax*0.7
+
+		plt.plot(tshere[:end],CMts2[:end,i], color="red",linestyle="-.")
+		plt.plot(tshere[:end],CEts2[:end,i], color="black",linestyle="-.")
+		
+
+		plt.axis([0,end,-1.1,1.1])
+		plt.legend(["M","E"])
+		#plt.legend(["M2","E2","M4","E4"])
+		#plt.legend(["M2","E2","M3","E3","M4","E4"])
+		plt.title("Ising model autocorrelation, T = {}".format(Ts[i]))
+		plt.xlabel("n timestep")
+		plt.ylabel("C(n)")
+		
+		fig6.savefig('figs/Autocorrelation{}.png'.format(i), bbox_inches='tight')
+		plt.clf()
+		
 
 def animate(i): #i increment with 1 each step
 
@@ -1089,14 +1112,7 @@ if __name__ == "__main__":
 	
 	tmax = 4000
 	
-	#======================================================
-	#RUN MAINSCRIPT
-	#Make (T,M) graph etc. For each temperature T, we add the final averaged out M,E,XT,Cv
-	Ms = []
-	Es = []
-	XTs = []
-	Cvs = []
-	Ts = []
+
 	
 	#======================================================
 	#Make Autocorrelations
@@ -1113,6 +1129,7 @@ if __name__ == "__main__":
 
 	#T = 1
 	#dT = 0.15
+	Ts = np.linspace(T,T+Nt*dT,Nt)
 	Tauto = np.linspace(T,T+Nt*dT,Nt)
 	CalcAutocorrelation(T)
 	#print(CEts)
@@ -1131,15 +1148,15 @@ if __name__ == "__main__":
 	
 	#====================================================
 	#Plot autocorrelation and time
-	
+	T = 0.9
 	PlotACFTemp()
 	PlotACFTime()
 	
 	
 	#=====================================================
 	#Main script, parallelized
-	
-	
+
+	#Make (T,M) graph etc. For each temperature T, we add the final averaged out M,E,XT,Cv
 	T = 0.9
 	dT = 0.1
 	Nt = 40
@@ -1147,6 +1164,15 @@ if __name__ == "__main__":
 	ntest = 16 #Amount of Monte Carlo runs we do for EACH temperature. To weed out local minimum effects
 	
 	tmax = 4000
+	
+	
+	Ms = []
+	Es = []
+	XTs = []
+	Cvs = []
+	Ts = np.linspace(T,T+Nt*dT,Nt)
+	
+	
 	
 	if tauint > N:
 		Nexperiment = tauint
