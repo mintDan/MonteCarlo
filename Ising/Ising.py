@@ -1,3 +1,11 @@
+"""
+2D Ising model solved by Metropolis algorithm.
+Calculates various statistics, including autocorrelation
+
+
+Dan Krog
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -298,7 +306,7 @@ def MCrunParallel(T,Nexperiment,J,nx,ny,PreCalcExp,out_list):
 	#Here I make the initial spin state. If T < Tcritical, i make fully aligned state of ones, else i make a random state of {-1,1}
 	
 	#randomS(S)
-	if T < 2.2:
+	if T < 2.269:
 		S = np.ones((ny,nx))
 
 
@@ -368,7 +376,7 @@ def MCrunParallel(T,Nexperiment,J,nx,ny,PreCalcExp,out_list):
 
 		dE = Esiteflip(S,randj,randi,nx,ny)
 	
-		if dE < 0:
+		if dE <= 0:
 			S[randj,randi] *= -1
 		else:
 			x = np.random.uniform(0,1)
@@ -782,14 +790,6 @@ def CalcAutocorrelation(T):
 		#PreCalcExp = [np.exp(-(2*i-8.0)/T) for i in range(9)]
 		PreCalcExp = np.exp([-(2*i-8.0)/T for i in range(9)])
 		
-		#==================================================================
-		#For autocorrelation
-
-		Marray = np.zeros(tmax)
-		M2array = np.zeros(tmax)
-		
-		Earray = np.zeros(tmax)
-		E2array = np.zeros(tmax)
 		
 		#==================================================================
 		#Fordi noget med at bad initial conditions kan give local minim..
@@ -805,7 +805,14 @@ def CalcAutocorrelation(T):
 		#Fordi den ændrer jo global array
 		
 		#for navg in range(ntest):
-			
+		#==================================================================
+		#For autocorrelation
+
+		Marray = np.zeros(tmax)
+		M2array = np.zeros(tmax)
+		
+		Earray = np.zeros(tmax)
+		E2array = np.zeros(tmax)
 		#==================================================================
 		#Think i should seed each run? WIthout any input it will use current time to seed.
 		np.random.seed()
@@ -814,7 +821,7 @@ def CalcAutocorrelation(T):
 		#Here I make the initial spin state. If T < Tcritical, i make fully aligned state of ones, else i make a random state of {-1,1}
 		
 		#randomS(S)
-		if T < 2.2:
+		if T < 2.269:
 			S = np.ones((ny,nx))
 
 	
@@ -832,7 +839,9 @@ def CalcAutocorrelation(T):
 		#This is the actual MonteCarlo loop, changing the configuration based on probabilities
 		#This should perhaps be a while loop instead... while Avgcount < 10
 		n = 0
-		while n < tmax-1:
+		
+		#Skal det være fra tmax eller tmax-1?
+		while n < Nequilibration+tmax-1:
 		#for n in range(150*N):
 			randi,randj = np.random.randint(0,nx,2)
 			#randj = np.random.randint(0,ny)
@@ -840,7 +849,7 @@ def CalcAutocorrelation(T):
 
 			dE = Esiteflip(S,randj,randi,nx,ny)
 		
-			if dE < 0:
+			if dE <= 0:
 				S[randj,randi] *= -1
 				EACF += dE
 			else:
@@ -879,41 +888,32 @@ def CalcAutocorrelation(T):
 			#Method 2
 			
 			
-			
-			Mauto = np.abs(np.sum(S))
-			Marray[n] = Mauto
-			M2array[n] = Mauto*Mauto
-			
-			Eauto = EACF#CalcH(S,nx,ny,J)
-			Earray[n] = Eauto
-			E2array[n] = Eauto*Eauto
+			#Det skal være >= tror jeg, fordi vi vil også gerne have nindex == 0
+			if n >= Nequilibration:
+				nindex = n-Nequilibration
+				Mauto = np.abs(np.sum(S))
+				Marray[nindex] = Mauto
+				M2array[nindex] = Mauto*Mauto
+				
+				Eauto = EACF#CalcH(S,nx,ny,J)
+				Earray[nindex] = Eauto
+				E2array[nindex] = Eauto*Eauto
 
 			n += 1
-
-		#=================================================================
-		#print some stuff to see progress
-		print("T = {0:.3f}".format(T))
-		
-		
-		#============================
-		#Increment T
-		T += dT
-		
-		
 		#=====================================
 		#De her ting TROR jeg skal bruges til alle metoderne, så dem laver vi bare
 		#Dette er averages OVER ALL TIMES
 		#Energy
 		Earrayavg = np.sum(Earray)/len(Earray)
 		E2arrayavg = np.sum(E2array)/len(E2array)
-		EX0 = E2arrayavg - Earrayavg*Earrayavg
+		#EX0 = E2arrayavg - Earrayavg*Earrayavg
 		
 		
 		
 		#Magnetization
 		Marrayavg = np.sum(Marray)/len(Marray)
 		M2arrayavg = np.sum(M2array)/len(Marray)
-		MX0 = M2arrayavg - Marrayavg*Marrayavg
+		#MX0 = M2arrayavg - Marrayavg*Marrayavg
 		
 		
 		#Der skal jo være faktor 1/(Nt-t)... Så, hvis Nt = 1000,
@@ -941,10 +941,34 @@ def CalcAutocorrelation(T):
 			#E1E2 *= 1/(nautotimes-j-1)
 			CEts2[k,nt] = Enume/Edenom
 			CMts2[k,nt] = Mnume/Mdenom
+		#=================================================================
+		#print some stuff to see progress
+		#print("T = {0:.3f}".format(T))
 		
-
+		
+		#============================
+		#Increment T
+		T += dT
+		
+		
+		
 		
 	return
+	
+def CalculateTauCorr():
+	for i in range(Nt):
+		#EUpToIndex = np.where(CEts2[:int(tmax*0.7),i] <= 0)[0]
+		#MUpToIndex = np.where(CMts2[:int(tmax*0.7),i] <= 0)[0]
+		
+		EUpToIndex = next(i for i, x_i in enumerate(CEts2[:,i]) if x_i <= 0)
+		MUpToIndex = next(i for i, x_i in enumerate(CMts2[:,i]) if x_i <= 0)
+		#print(EUpToIndex)
+		#print(MUpToIndex)
+		#problem er at argmax leder igennem HELE array... stopper ikke ved første index
+		#EUpToIndex = np.argmax(CEts2[:,i]<=0)
+		#MUpToIndex = np.argmax(CMts2[:,i]<=0)
+		tauEarray[i] = int(0.5 + np.sum(CEts2[:EUpToIndex,i]))
+		tauMarray[i] = int(0.5 + np.sum(CMts2[:MUpToIndex,i]))
 
 
 def PlotValues():
@@ -982,12 +1006,12 @@ def PlotValues():
 	fig5.savefig('figs/Specificheat.png', bbox_inches='tight')
 	plt.show()
 
-def PlotACFTemp():
+def PlotACFTemp(tauE,tauM):
 	fig7 = plt.figure(6)
 
 
-	plt.plot(Tauto,tauMarray, color="red",linestyle="-.")
-	plt.plot(Tauto,tauEarray, color="black",linestyle="-.")
+	plt.plot(Ts,tauM, color="red",linestyle="-.")
+	plt.plot(Ts,tauE, color="black",linestyle="-.")
 	
 
 	
@@ -1015,14 +1039,15 @@ def PlotACFTime():
 	plt.legend(["M","E"])
 	#plt.legend(["M2","E2","M4","E4"])
 	#plt.legend(["M2","E2","M3","E3","M4","E4"])
-	plt.title("Ising model autocorrelation, T = {}".format(Ts[30]))
+	plt.title("Ising model autocorrelation, T = {:0.2f}".format(Ts[30]))
 	plt.xlabel("n timestep")
 	plt.ylabel("C(n)")
 	fig6.savefig('figs/Autocorrelation.png', bbox_inches='tight')
 	#plt.show()
 
-	plt.clf()	
+	#plt.clf()	
 	for i in range(Nt):
+		plt.clf()
 		fig6 = plt.figure(6)
 		
 		#Either use tmax/3 or tmax*0.7
@@ -1035,12 +1060,12 @@ def PlotACFTime():
 		plt.legend(["M","E"])
 		#plt.legend(["M2","E2","M4","E4"])
 		#plt.legend(["M2","E2","M3","E3","M4","E4"])
-		plt.title("Ising model autocorrelation, T = {}".format(Ts[i]))
+		plt.title("Ising model autocorrelation, T = {:0.2f}".format(Ts[i]))
 		plt.xlabel("n timestep")
 		plt.ylabel("C(n)")
 		
 		fig6.savefig('figs/Autocorrelation{}.png'.format(i), bbox_inches='tight')
-		plt.clf()
+		
 		
 
 def animate(i): #i increment with 1 each step
@@ -1108,12 +1133,12 @@ if __name__ == "__main__":
 	dT = 0.1
 	Nt = 40
 	J = 1# J > 0 gives ferromagnetism
-	ntest = 16 #Amount of Monte Carlo runs we do for EACH temperature. To weed out local minimum effects
+	ntest = 10 #Amount of Monte Carlo runs we do for EACH temperature. To weed out local minimum effects
 	
-	tmax = 4000
+	tmax = 15000
 	
 
-	
+	Nequilibration = 5*N
 	#======================================================
 	#Make Autocorrelations
 	#Should perhaps fit to data also, maybe? so i get the actual time thing.
@@ -1121,35 +1146,48 @@ if __name__ == "__main__":
 	#For autocorrelation, we don't take 10 tests i think, at least in the most simple case
 	#so, ntest = 1 we put it.
 	#Nt = 20
-	kt = 6
-	tmax = int(kt*1000)
-	#Autocorrelation
-	CEts2 = np.zeros((tmax,Nt))
-	CMts2 = np.zeros((tmax,Nt))
+	#kt = 6
+	#tmax = int(kt*1000)
+	TauEarrayBig = np.zeros((Nt,ntest))
+	TauMarrayBig = np.zeros((Nt,ntest))
+	Ts = np.linspace(T,T+(Nt-1)*dT,Nt,endpoint=True)
+	for navg in range(ntest):
+		print(navg)
+		#Autocorrelation
+		CEts2 = np.zeros((tmax,Nt))
+		CMts2 = np.zeros((tmax,Nt))
+		T = 0.9
+		#T = 1
+		#dT = 0.15
+		CalcAutocorrelation(T)
+		#print(CEts)
+		
+		#======================================================
+		#Calculate integrated autocorrelation time
+		tauEarray = np.zeros(Nt)
+		tauMarray = np.zeros(Nt)
 
-	#T = 1
-	#dT = 0.15
-	Ts = np.linspace(T,T+Nt*dT,Nt)
-	Tauto = np.linspace(T,T+Nt*dT,Nt)
-	CalcAutocorrelation(T)
-	#print(CEts)
+		CalculateTauCorr()
+		
+		TauEarrayBig[:,navg] = tauEarray
+		TauMarrayBig[:,navg] = tauMarray
 	
-	
-	tauEarray = np.zeros(Nt)
-	tauMarray = np.zeros(Nt)
-	for i in range(Nt):
-		tauEarray[i] = int(0.5 + np.sum(CEts2[:int(tmax*0.7),i]))
-		tauMarray[i] = int(0.5 + np.sum(CMts2[:int(tmax*0.7),i]))
-	
-	tauint1 = int(0.5 + np.sum(CEts2[:int(tmax*0.7),Nt-1]))
-	tauint2 = int(0.5 + np.sum(CMts2[:int(tmax*0.7),Nt-1]))
-	tauint = max(tauint1,tauint2)
-	print(tauint)
+	TauEavg = np.zeros(Nt)
+	TauMavg = np.zeros(Nt)
+	for navg in range(ntest):
+		TauEavg += TauEarrayBig[:,navg]
+		TauMavg += TauMarrayBig[:,navg]
+	TauEavg *= 1/ntest
+	TauMavg *= 1/ntest
+	#tauint1 = int(0.5 + np.sum(CEts2[:int(tmax*0.7),Nt-1]))
+	#tauint2 = int(0.5 + np.sum(CMts2[:int(tmax*0.7),Nt-1]))
+	#tauint = max(tauint1,tauint2)
+	#print(tauint)
 	
 	#====================================================
 	#Plot autocorrelation and time
 	T = 0.9
-	PlotACFTemp()
+	PlotACFTemp(TauEavg,TauMavg)
 	PlotACFTime()
 	
 	
@@ -1163,7 +1201,7 @@ if __name__ == "__main__":
 	J = 1# J > 0 gives ferromagnetism
 	ntest = 16 #Amount of Monte Carlo runs we do for EACH temperature. To weed out local minimum effects
 	
-	tmax = 4000
+	tmax = 20000
 	
 	
 	Ms = []
@@ -1182,7 +1220,7 @@ if __name__ == "__main__":
 	#1 for save, 0 for no savefig
 	SaveFig = 0
 	
-	MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts2,CMts2)
+	#MainScript(T,Ms,Es,XTs,Cvs,Ts,CEts2,CMts2)
 	
 
 	

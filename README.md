@@ -71,7 +71,12 @@ For large t values we're calculating a large lag. This also means that the large
 measurements will start to create noise in the autocorrelation function, making wild oscillations and peaks etc. So here we cut off the autocorrelation plot at 0.7*tmax, so the noisy tail isn't visible.
 Integrating the autocorrelation values gives the integrated autocorrelation time. In a sense it's a more direct way to get the parameter for exponential decay compared to fitting and doing least squares etc.  The integrated autocorrelation time calculated is then used in collecting data to avoid correlated data.
 
-![Autocorrelation.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Autocorrelation.png) 
+![Autocorrelation.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/Autocorrelation.png)  
+
+We can see integrated autocorrelation time for different temperatures. Near the critical temperature we have large clusters, so the spins are not likely to flip. Also, the temperature is low enough that the probability of flipping based on thermal disturbances is not that high either. So we have higher correlation time  
+at Tc. When the temperature increases further, we begin to break up clusters and also increase the chance of flipping spins due to thermal disturbances, so the autocorrelation time decreases.  
+
+![AutocorrelationTemp.png](https://github.com/mintDan/MonteCarlo/blob/master/figs/AutocorrelationTemp.png)  
 
 ## Random Walk method
 A partial differential equation can be solved by Random Walk method. Starting from some point, we do N random walks, where each walk ends when we land on a boundary. The value at the boundary is then recorded.
