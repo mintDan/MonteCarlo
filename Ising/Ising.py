@@ -841,7 +841,7 @@ def CalcAutocorrelation(T):
 		n = 0
 		
 		#Skal det være fra tmax eller tmax-1?
-		while n < Nequilibration+tmax-1:
+		while n <= Nequilibration+tmax-1:
 		#for n in range(150*N):
 			randi,randj = np.random.randint(0,nx,2)
 			#randj = np.random.randint(0,ny)
@@ -900,6 +900,9 @@ def CalcAutocorrelation(T):
 				E2array[nindex] = Eauto*Eauto
 
 			n += 1
+			
+		#Lige nu printer den 15000
+		#print(n-Nequilibration)
 		#=====================================
 		#De her ting TROR jeg skal bruges til alle metoderne, så dem laver vi bare
 		#Dette er averages OVER ALL TIMES
@@ -935,12 +938,42 @@ def CalcAutocorrelation(T):
 			#for i in range(nautotimes-k):
 				#M1M2 += Marray[i]*Marray[i+k]
 				#E1E2 += Earray[i]*Earray[i+k]
+			
+			#Hvis der er tmax=4000 elements i array, så kan jeg skrive
+			#Marray[:3999] = Marray[:tmax-1]
+			#Hvis k = 0, så
+			#(Marray[:tmax-0]-Marrayavg)*(Marray[0:tmax]-Marrayavg)
+			#(Marray[:tmax]-Marrayavg)*(Marray[0:tmax]-Marrayavg)
+			#Så, for k = 0, burde jeg da have tmax-1 et sted?
+			#Det kan være at jeg kun indsætter n = tmax-1 objects ind i array, dog!
+			#Så har vi en empty 0 at the end,
+			#Så jeg bør faktisk prøve at print("Hvor mange gange har jeg sat et element ind i Marray")
+			#Og, print(len(Marray)) Er jo IKKE nok, forid den HAR jo netop tmax length, det sidste element er måske bare 0
+			#OGSÅ, for k = 0, jeg skal vidst lige være sikker på, at begge array er ens...
+			#Fordi k = 0, svarer til,(Marray[:tmax]-Marrayavg)*(Marray[:tmax]-Marrayavg)
+			#Så jo, begge array ER ens, godt nok...
+			#
+			#Now, k = 1, hvad så?
+			#(Marray[:tmax-1]-Marrayavg)*(Marray[1:tmax]-Marrayavg)
+			
+			#
+				
 			Mnume = np.sum((Marray[:tmax-k]-Marrayavg)*(Marray[k:tmax]-Marrayavg))
 			Enume = np.sum((Earray[:tmax-k]-Earrayavg)*(Earray[k:tmax]-Earrayavg))
 			#M1M2 *= 1/(nautotimes-j-1)
 			#E1E2 *= 1/(nautotimes-j-1)
-			CEts2[k,nt] = Enume/Edenom
-			CMts2[k,nt] = Mnume/Mdenom
+			CEts2[k,nt] = Enume
+			CMts2[k,nt] = Mnume
+		
+		CEts2[:,nt] *= 1/Edenom
+		CMts2[:,nt] *= 1/Mdenom
+		print(Edenom,Mdenom)
+		
+		#==========================================
+		#Method 3
+		
+			#CEts3[k,nt] = Enume/Edenom
+			#CMts3[k,nt] = Mnume/Mdenom
 		#=================================================================
 		#print some stuff to see progress
 		#print("T = {0:.3f}".format(T))
@@ -959,16 +992,18 @@ def CalculateTauCorr():
 	for i in range(Nt):
 		#EUpToIndex = np.where(CEts2[:int(tmax*0.7),i] <= 0)[0]
 		#MUpToIndex = np.where(CMts2[:int(tmax*0.7),i] <= 0)[0]
-		
-		EUpToIndex = next(i for i, x_i in enumerate(CEts2[:,i]) if x_i <= 0)
-		MUpToIndex = next(i for i, x_i in enumerate(CMts2[:,i]) if x_i <= 0)
-		#print(EUpToIndex)
-		#print(MUpToIndex)
-		#problem er at argmax leder igennem HELE array... stopper ikke ved første index
-		#EUpToIndex = np.argmax(CEts2[:,i]<=0)
-		#MUpToIndex = np.argmax(CMts2[:,i]<=0)
-		tauEarray[i] = int(0.5 + np.sum(CEts2[:EUpToIndex,i]))
-		tauMarray[i] = int(0.5 + np.sum(CMts2[:MUpToIndex,i]))
+		try:
+			EUpToIndex = next(i for i, x_i in enumerate(CEts2[:,i]) if x_i <= 0)
+			MUpToIndex = next(i for i, x_i in enumerate(CMts2[:,i]) if x_i <= 0)
+			#print(EUpToIndex)
+			#print(MUpToIndex)
+			#problem er at argmax leder igennem HELE array... stopper ikke ved første index
+			#EUpToIndex = np.argmax(CEts2[:,i]<=0)
+			#MUpToIndex = np.argmax(CMts2[:,i]<=0)
+			tauEarray[i] = int(0.5 + np.sum(CEts2[:EUpToIndex,i]))
+			tauMarray[i] = int(0.5 + np.sum(CMts2[:MUpToIndex,i]))
+		except:
+			pass
 
 
 def PlotValues():
